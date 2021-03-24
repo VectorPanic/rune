@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: display/DisplayObjectContainer.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: display/DisplayObjectContainer.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//------------------------------------------------------------------------------
+// Constructor scope
+//------------------------------------------------------------------------------
+
+/**
+ * TODO: ...
+ *
+ * @constructor
+ * @extends rune.display.InteractiveObject
+ *
+ * @param {number} [x=0] ...
+ * @param {number} [y=0] ...
+ * @param {number} [width=0] ...
+ * @param {number} [height=0] ...
+ * @param {string} [fillColor=""] ...
+ *
+ * @class
+ * @classdesc
+ * 
+ * TODO: ...
+ */
+rune.display.DisplayObjectContainer = function(x, y, width, height, fillColor) {
+    
+    //--------------------------------------------------------------------------
+    // Public properties
+    //--------------------------------------------------------------------------
+
+    /**
+     * Reference to sort function. Sorting is executed for each active frame 
+     * and affects the order of current child objects.
+     *
+     * @type {Function}
+     * @default null
+     */
+    this.sort = null;
+
+    /**
+     * ...
+     *
+     * @type {number}
+     * @default 1.0
+     */
+    this.timeScale = 1.0;
+    
+    //--------------------------------------------------------------------------
+    // Protected properties
+    //--------------------------------------------------------------------------
+
+    /**
+     * List of current children.
+     *
+     * @type {Array.&lt;rune.display.DisplayObject>}
+     * @protected
+     * @ignore
+     */
+    this.m_children = [];
+    
+    //--------------------------------------------------------------------------
+    // Super call
+    //--------------------------------------------------------------------------
+    
+    /**
+     * Extend DisplayObject.
+     */
+    rune.display.InteractiveObject.call(this, x, y, width, height, fillColor);
+};
+
+//------------------------------------------------------------------------------
+// Inheritance
+//------------------------------------------------------------------------------
+
+rune.display.DisplayObjectContainer.prototype = Object.create(rune.display.InteractiveObject.prototype);
+rune.display.DisplayObjectContainer.prototype.constructor = rune.display.DisplayObjectContainer;
+
+//------------------------------------------------------------------------------
+// Public getter and setter methods
+//------------------------------------------------------------------------------
+
+/**
+ * Returns the number of children of this object.
+ *
+ * @member {number} numChildren
+ * @memberof rune.display.DisplayObjectContainer
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.display.DisplayObjectContainer.prototype, "numChildren", {
+    /**
+     * @this rune.display.DisplayObjectContainer
+     * @ignore
+     */
+    get : function() {
+        return this.m_children.length;
+    }
+});
+
+//------------------------------------------------------------------------------
+// Public prototype methods (API)
+//------------------------------------------------------------------------------
+
+/**
+ * Adds a child DisplayObject instance to this DisplayObjectContainer instance. 
+ * The child is added to the front (top) of all other children in this 
+ * DisplayObjectContainer instance. To add a child to a specific index 
+ * position, use the addChildAt() method.
+ *
+ * @param {rune.display.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
+ *
+ * @throws {Error} Throws if the child is the same as the parent.
+ * @throws {TypeError} Throws if the child is not of type DisplayObject.
+ *
+ * @return {rune.display.DisplayObject} The DisplayObject instance that you pass in the child parameter.
+ */
+rune.display.DisplayObjectContainer.prototype.addChild = function(child) {
+    if (child instanceof rune.display.DisplayObject) {
+        if (child != this) {
+            child.setParent(this, this['numChildren']);
+            child.init();
+        } else throw new Error();
+    } else throw new TypeError();
+    
+    return child;
+};
+
+/**
+ * Adds a child DisplayObject instance to this DisplayObjectContainer instance. 
+ * The child is added at the index position specified. An index of 0 represents 
+ * the back (bottom) of the display list for this DisplayObjectContainer object.
+ *
+ * @param {rune.display.DisplayObject} child The DisplayObject instance to add as a child of this DisplayObjectContainer instance.
+ * @param {number} index The index position to which the child is added. If you specify a currently occupied index position, the child object that exists at that position and all higher positions are moved up one position in the child list.
+ *
+ * @throws {TypeError} ...
+ * @throws {RangeError} Throws if the index position does not exist in the child list.
+ * @throws {Error} ...
+ *
+ * @return {rune.display.DisplayObject} The DisplayObject instance that you pass in the child parameter.
+ */
+rune.display.DisplayObjectContainer.prototype.addChildAt = function(child, index) {
+    if (child instanceof rune.display.DisplayObject) {
+        if (index > -1 &amp;&amp; index &lt;= this.m_children.length) {
+            if (child != this) {
+                child.setParent(this, index);
+                child.init();
+            } else throw new Error();
+        } else throw new RangeError();
+    } else throw new TypeError();
+    
+    return child;
+};
+
+/**
+ * Returns the child display object instance that exists at the specified index.
+ *
+ * @param {number} index The index position of the child object.
+ *
+ * @throws {RangeError} Throws if the index does not exist in the child list.
+ *
+ * @return {rune.display.DisplayObject} The index position of the child object.
+ */
+rune.display.DisplayObjectContainer.prototype.getChildAt = function(index) {
+    if (index > -1 &amp;&amp; index &lt; this.m_children.length) {
+        return this.m_children[index];
+    } else throw new RangeError();
+};
+
+/**
+ * Returns the index position of a child DisplayObject instance.
+ *
+ * @param {rune.display.DisplayObject} child The DisplayObject instance to identify.
+ *
+ * @return {number} The index position of the child display object to identify.
+ */
+rune.display.DisplayObjectContainer.prototype.getChildIndex = function(child) {
+    return this.m_children.indexOf(child);
+};
+
+/**
+ * Returns a list of all children.
+ *
+ * @return {Array.&lt;rune.display.DisplayObject>}
+ */
+rune.display.DisplayObjectContainer.prototype.getChildren = function() {
+    return this.m_children;
+};
+
+/**
+ * Checks if a specific child exists.
+ *
+ * @param {rune.display.DisplayObject} child ...
+ *
+ * @return {boolean}
+ */
+rune.display.DisplayObjectContainer.prototype.hasChild = function(child) {
+    return (child) ? (this === child['parent']) : false;
+};
+
+/**
+ * Removes the specified child DisplayObject instance from the child list of 
+ * the DisplayObjectContainer instance. The parent property of the removed 
+ * child is set to null , and the object is garbage collected if no other 
+ * references to the child exist. The index positions of any display objects 
+ * above the child in the DisplayObjectContainer are decreased by 1.
+ *
+ * @param {rune.display.DisplayObject} child ...
+ * @param {boolean} dispose ...
+ *
+ * @return {rune.display.DisplayObject}
+ */
+rune.display.DisplayObjectContainer.prototype.removeChild = function(child, dispose) {
+    if (this.hasChild(child)) {
+        
+        child.removeGroup();
+        child.removeParent();
+        
+        if (dispose === true) {
+            child.dispose();
+            child = null;
+        }
+    }
+    
+    return child;
+};
+
+/**
+ * ...
+ *
+ * @param {boolean} dispose ...
+ *
+ * @return {undefined}
+ */
+rune.display.DisplayObjectContainer.prototype.removeChildren = function(dispose) {
+    while (this.m_children.length > 0) {
+        this.removeChild(this.getChildAt(0), dispose);
+    }
+};
+
+/**
+ * ...
+ *
+ * @param {Function} func ...
+ *
+ * @throws {TypeError} ...
+ *
+ * @return {undefined}
+ */
+rune.display.DisplayObjectContainer.prototype.sortChildren = function(func) {
+    if (typeof func === "function") {
+        this.m_children.sort(func);
+        this.breakCache();
+    } else throw new TypeError();
+};
+
+/**
+ * ...
+ *
+ * @param {rune.display.DisplayObject} a ...
+ * @param {rune.display.DisplayObject} b ...
+ *
+ * @return {boolean} ...
+ */
+rune.display.DisplayObjectContainer.prototype.swapChildren = function(a, b) {
+    var ai = this.getChildIndex(a);
+    var bi = this.getChildIndex(b);
+
+    if ((ai !== -1) &amp;&amp; (bi !== -1)) {
+        var tz = a.z;
+        a.z = b.z;
+        b.z = tz;
+
+        this.m_children[ai] = b;
+        this.m_children[bi] = a;
+
+        this.breakCache();
+
+        return true;
+    }
+
+    return false;
+};
+
+//------------------------------------------------------------------------------
+// Override public prototype methods (ENGINE)
+//------------------------------------------------------------------------------
+
+/**
+ * @inheritDoc
+ */
+rune.display.DisplayObjectContainer.prototype.update = function(step) {
+    rune.display.InteractiveObject.prototype.update.call(this, step);
+    this.m_updateChildren(step);
+};
+
+/**
+ * @inheritDoc
+ */
+rune.display.DisplayObjectContainer.prototype.render = function() {
+    this.m_renderFillColor();
+    this.m_renderChildren();
+    this.m_renderGraphics();
+    this.m_renderStates();
+};
+
+/**
+ * @inheritDoc
+ */
+rune.display.DisplayObjectContainer.prototype.dispose = function() {
+    this.m_disposeChildren();
+    rune.display.InteractiveObject.prototype.dispose.call(this);
+};
+
+//------------------------------------------------------------------------------
+// Protected prototype methods (ENGINE)
+//------------------------------------------------------------------------------
+
+/**
+ * TODO: ...
+ *
+ * @param {number} step ...
+ *
+ * @return {undefined}
+ * @protected
+ * @ignore
+ */
+rune.display.DisplayObjectContainer.prototype.m_updateChildren = function(step) {
+    var c = this.m_children;
+    var i = c.length;
+    
+    if (this.sort != null) {
+        this.sortChildren(this.sort);
+    }
+    
+    while (i--) {
+        this.m_updateChild(c[i], step);
+    }
+};
+
+/**
+ * TODO: ...
+ *
+ * @param {rune.display.DisplayObject} child ...
+ * @param {number} step ...
+ *
+ * @return {undefined}
+ * @ignore
+ */
+rune.display.DisplayObjectContainer.prototype.m_updateChild = function(child, step) {
+    if (child != null) {
+        if (child["active"] == true) {
+            child.update(step * this.timeScale);
+        }
+    }
+};
+
+/**
+ * TODO: ...
+ *
+ * @return {undefined}
+ * @protected
+ * @ignore
+ */
+rune.display.DisplayObjectContainer.prototype.m_renderChildren = function() {
+    var children = this.m_children;
+    for (var i = 0, l = children.length; i &lt; l; i++) {
+        this.m_renderChild(children[i]);
+    } 
+};
+
+/**
+ * TODO: ...
+ *
+ * @param {rune.display.DisplayObject} child ...
+ *
+ * @return {undefined}
+ * @protected
+ * @ignore
+ */
+rune.display.DisplayObjectContainer.prototype.m_renderChild = function(child) {
+    this.m_canvas.renderObj(child);
+    this.m_renderChildDebug(child);
+};
+
+/**
+ * TODO: ...
+ *
+ * @param {rune.display.DisplayObject} obj ...
+ *
+ * @return {undefined}
+ * @protected
+ * @ignore
+ */
+rune.display.DisplayObjectContainer.prototype.m_renderChildDebug = function(obj) {
+    /*
+    if (this.debug == true) {
+        var frame = obj.getRenderFrame();
+        
+        this.m_canvas.drawRect(
+            obj.x,
+            obj.y,
+            obj.width,
+            obj.height,
+            "#00FF00"
+        );
+        
+        this.m_canvas.drawRect(
+            frame.x,
+            frame.y,
+            frame.width,
+            frame.height,
+            "#FF0000"
+        );
+    }
+    */
+};
+
+/**
+ * TODO: ...
+ *
+ * @return {undefined}
+ * @protected
+ * @ignore
+ */
+rune.display.DisplayObjectContainer.prototype.m_disposeChildren = function() {
+    //TODO: ...
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="rune.html">rune</a></li><li><a href="rune.animation.html">animation</a></li><li><a href="rune.camera.html">camera</a></li><li><a href="rune.color.html">color</a></li><li><a href="rune.data.html">data</a></li><li><a href="rune.display.html">display</a></li><li><a href="rune.game.html">game</a></li><li><a href="rune.geom.html">geom</a></li><li><a href="rune.input.html">input</a></li><li><a href="rune.media.html">media</a></li><li><a href="rune.net.html">net</a></li><li><a href="rune.physics.html">physics</a></li><li><a href="rune.resource.html">resource</a></li><li><a href="rune.scene.html">scene</a></li><li><a href="rune.screen.html">screen</a></li><li><a href="rune.state.html">state</a></li><li><a href="rune.system.html">system</a></li><li><a href="rune.text.html">text</a></li><li><a href="rune.tilemap.html">tilemap</a></li><li><a href="rune.timer.html">timer</a></li><li><a href="rune.tween.html">tween</a></li><li><a href="rune.ui.html">ui</a></li><li><a href="rune.util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="rune.animation.Animation.html">Animation</a></li><li><a href="rune.animation.Animations.html">Animations</a></li><li><a href="rune.camera.Camera.html">Camera</a></li><li><a href="rune.camera.CameraFade.html">CameraFade</a></li><li><a href="rune.camera.CameraFlash.html">CameraFlash</a></li><li><a href="rune.camera.Cameras.html">Cameras</a></li><li><a href="rune.camera.CameraShake.html">CameraShake</a></li><li><a href="rune.camera.CameraTargets.html">CameraTargets</a></li><li><a href="rune.camera.CameraTint.html">CameraTint</a></li><li><a href="rune.camera.CameraTintTween.html">CameraTintTween</a></li><li><a href="rune.camera.CameraViewport.html">CameraViewport</a></li><li><a href="rune.color.Color24.html">Color24</a></li><li><a href="rune.color.Color32.html">Color32</a></li><li><a href="rune.color.ColorComponent.html">ColorComponent</a></li><li><a href="rune.data.EngineManifest.html">EngineManifest</a></li><li><a href="rune.data.Highscores.html">Highscores</a></li><li><a href="rune.data.LogoIcon.html">LogoIcon</a></li><li><a href="rune.data.LogoText.html">LogoText</a></li><li><a href="rune.data.SceneBoot.html">SceneBoot</a></li><li><a href="rune.data.SceneBootDebug.html">SceneBootDebug</a></li><li><a href="rune.display.Canvas.html">Canvas</a></li><li><a href="rune.display.DisplayGroup.html">DisplayGroup</a></li><li><a href="rune.display.DisplayGroups.html">DisplayGroups</a></li><li><a href="rune.display.DisplayObject.html">DisplayObject</a></li><li><a href="rune.display.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="rune.display.Flicker.html">Flicker</a></li><li><a href="rune.display.Frame.html">Frame</a></li><li><a href="rune.display.Graphic.html">Graphic</a></li><li><a href="rune.display.Graphics.html">Graphics</a></li><li><a href="rune.display.Hitbox.html">Hitbox</a></li><li><a href="rune.display.InteractiveObject.html">InteractiveObject</a></li><li><a href="rune.display.Quadtree.html">Quadtree</a></li><li><a href="rune.display.RepeatedGraphic.html">RepeatedGraphic</a></li><li><a href="rune.display.Sprite.html">Sprite</a></li><li><a href="rune.display.Stage.html">Stage</a></li><li><a href="rune.display.Texture.html">Texture</a></li><li><a href="rune.game.Entity.html">Entity</a></li><li><a href="rune.geom.Point.html">Point</a></li><li><a href="rune.geom.Rectangle.html">Rectangle</a></li><li><a href="rune.geom.Vector2D.html">Vector2D</a></li><li><a href="rune.input.Gamepad.html">Gamepad</a></li><li><a href="rune.input.Gamepads.html">Gamepads</a></li><li><a href="rune.input.GamepadsOptions.html">GamepadsOptions</a></li><li><a href="rune.input.Inputs.html">Inputs</a></li><li><a href="rune.input.Keyboard.html">Keyboard</a></li><li><a href="rune.input.KeyboardKey.html">KeyboardKey</a></li><li><a href="rune.input.KeyboardOptions.html">KeyboardOptions</a></li><li><a href="rune.input.Mouse.html">Mouse</a></li><li><a href="rune.input.MouseButton.html">MouseButton</a></li><li><a href="rune.input.MouseOptions.html">MouseOptions</a></li><li><a href="rune.media.Sound.html">Sound</a></li><li><a href="rune.media.SoundChannel.html">SoundChannel</a></li><li><a href="rune.media.Sounds.html">Sounds</a></li><li><a href="rune.net.URLLoader.html">URLLoader</a></li><li><a href="rune.net.URLRequest.html">URLRequest</a></li><li><a href="rune.net.URLResponse.html">URLResponse</a></li><li><a href="rune.physics.Body.html">Body</a></li><li><a href="rune.physics.Space.html">Space</a></li><li><a href="rune.physics.Velocity.html">Velocity</a></li><li><a href="rune.resource.Cache.html">Cache</a></li><li><a href="rune.resource.Encoder.html">Encoder</a></li><li><a href="rune.resource.Manifest.html">Manifest</a></li><li><a href="rune.resource.Resources.html">Resources</a></li><li><a href="rune.resource.Storage.html">Storage</a></li><li><a href="rune.scene.Scene.html">Scene</a></li><li><a href="rune.scene.Scenes.html">Scenes</a></li><li><a href="rune.screen.Screen.html">Screen</a></li><li><a href="rune.state.State.html">State</a></li><li><a href="rune.state.States.html">States</a></li><li><a href="rune.system.Config.html">Config</a></li><li><a href="rune.system.Main.html">Main</a></li><li><a href="rune.system.Time.html">Time</a></li><li><a href="rune.text.BitmapField.html">BitmapField</a></li><li><a href="rune.text.BitmapFormat.html">BitmapFormat</a></li><li><a href="rune.tilemap.Tile.html">Tile</a></li><li><a href="rune.tilemap.Tilemap.html">Tilemap</a></li><li><a href="rune.tilemap.TilemapLayer.html">TilemapLayer</a></li><li><a href="rune.tilemap.TilemapLayers.html">TilemapLayers</a></li><li><a href="rune.tilemap.Tiles.html">Tiles</a></li><li><a href="rune.timer.Timer.html">Timer</a></li><li><a href="rune.timer.TimerOptions.html">TimerOptions</a></li><li><a href="rune.timer.Timers.html">Timers</a></li><li><a href="rune.tween.Back.html">Back</a></li><li><a href="rune.tween.Bounce.html">Bounce</a></li><li><a href="rune.tween.Circular.html">Circular</a></li><li><a href="rune.tween.Cubic.html">Cubic</a></li><li><a href="rune.tween.Expo.html">Expo</a></li><li><a href="rune.tween.Linear.html">Linear</a></li><li><a href="rune.tween.Quad.html">Quad</a></li><li><a href="rune.tween.Quart.html">Quart</a></li><li><a href="rune.tween.Quint.html">Quint</a></li><li><a href="rune.tween.Sine.html">Sine</a></li><li><a href="rune.tween.Tween.html">Tween</a></li><li><a href="rune.tween.TweenProp.html">TweenProp</a></li><li><a href="rune.tween.Tweens.html">Tweens</a></li><li><a href="rune.ui.Button.html">Button</a></li><li><a href="rune.ui.Console.html">Console</a></li><li><a href="rune.ui.ConsoleCommand.html">ConsoleCommand</a></li><li><a href="rune.ui.ConsoleCommands.html">ConsoleCommands</a></li><li><a href="rune.ui.ConsoleCursor.html">ConsoleCursor</a></li><li><a href="rune.ui.ConsoleHistory.html">ConsoleHistory</a></li><li><a href="rune.ui.ConsoleInput.html">ConsoleInput</a></li><li><a href="rune.ui.ConsoleManager.html">ConsoleManager</a></li><li><a href="rune.ui.ConsoleOutput.html">ConsoleOutput</a></li><li><a href="rune.ui.Counter.html">Counter</a></li><li><a href="rune.ui.CounterDigit.html">CounterDigit</a></li><li><a href="rune.ui.Debugger.html">Debugger</a></li><li><a href="rune.ui.Framerate.html">Framerate</a></li><li><a href="rune.ui.FramerateHistogram.html">FramerateHistogram</a></li><li><a href="rune.ui.FramerateHistogramBar.html">FramerateHistogramBar</a></li><li><a href="rune.ui.Memory.html">Memory</a></li><li><a href="rune.ui.MouseCursor.html">MouseCursor</a></li><li><a href="rune.ui.Progressbar.html">Progressbar</a></li><li><a href="rune.ui.RenderBudget.html">RenderBudget</a></li><li><a href="rune.ui.TextButton.html">TextButton</a></li><li><a href="rune.ui.UpdateBudget.html">UpdateBudget</a></li><li><a href="rune.util.DataURL.html">DataURL</a></li><li><a href="rune.util.Event.html">Event</a></li><li><a href="rune.util.Executable.html">Executable</a></li><li><a href="rune.util.Filter.html">Filter</a></li><li><a href="rune.util.Math.html">Math</a></li><li><a href="rune.util.Stack.html">Stack</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Mar 24 2021 22:09:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

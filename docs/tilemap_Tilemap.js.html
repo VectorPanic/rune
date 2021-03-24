@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: tilemap/Tilemap.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: tilemap/Tilemap.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//------------------------------------------------------------------------------
+// Constructor scope
+//------------------------------------------------------------------------------
+
+/** 
+ * ...
+ * 
+ * @constructor
+ * 
+ * @class
+ * @classdesc
+ * 
+ * ...
+ */
+rune.tilemap.Tilemap = function() {
+
+    //--------------------------------------------------------------------------
+    // Private properties
+    //--------------------------------------------------------------------------
+
+    /**
+     * ...
+     *
+     * @type {rune.tilemap.TilemapLayers}
+     * @private
+     */
+    this.m_layers = new rune.tilemap.TilemapLayers(this);
+    
+    /**
+     * ...
+     *
+     * @type {HTMLImageElement}
+     * @private
+     */
+    this.m_texture = null;
+    
+    /**
+     * ...
+     *
+     * @type {number}
+     * @private
+     */
+    this.m_tileHeight = 16;
+    
+    /**
+     * ...
+     *
+     * @type {rune.tilemap.Tiles}
+     * @private
+     */
+    this.m_tiles = new rune.tilemap.Tiles(this);
+    
+    /**
+     * ...
+     *
+     * @type {number}
+     * @private
+     */
+    this.m_tileWidth = 16;
+    
+    //--------------------------------------------------------------------------
+    // Constructor call
+    //--------------------------------------------------------------------------
+
+    /**
+     * ...
+     */
+    this.m_construct();
+};
+
+//------------------------------------------------------------------------------
+// Public getter and setter methods
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @member {rune.tilemap.TilemapLayers} layers
+ * @memberof rune.tilemap.Tilemap
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.tilemap.Tilemap.prototype, "layers", {
+    /**
+     * @this rune.tilemap.Tilemap
+     * @ignore
+     */
+    get : function() {
+        return this.m_layers;
+    }
+});
+
+/**
+ * ...
+ *
+ * @member {HTMLImageElement} texture
+ * @memberof rune.tilemap.Tilemap
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.tilemap.Tilemap.prototype, "texture", {
+    /**
+     * @this rune.tilemap.Tilemap
+     * @ignore
+     */
+    get : function() {
+        return this.m_texture;
+    }
+});
+
+/**
+ * ...
+ *
+ * @member {number} tileHeight
+ * @memberof rune.tilemap.Tilemap
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.tilemap.Tilemap.prototype, "tileHeight", {
+    /**
+     * @this rune.tilemap.Tilemap
+     * @ignore
+     */
+    get : function() {
+        return this.m_tileHeight;
+    }
+});
+
+/**
+ * ...
+ *
+ * @member {number} tileHeight
+ * @memberof rune.tilemap.Tilemap
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.tilemap.Tilemap.prototype, "tileWidth", {
+    /**
+     * @this rune.tilemap.Tilemap
+     * @ignore
+     */
+    get : function() {
+        return this.m_tileWidth;
+    }
+});
+
+//------------------------------------------------------------------------------
+// Public prototype methods (API)
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @return {undefined}
+ */
+rune.tilemap.Tilemap.prototype.clear = function() {
+    if (this.m_layers != null) {
+        this.m_layers.clear();
+    }
+};
+
+/**
+ * ...
+ *
+ * @return {undefined}
+ */
+rune.tilemap.Tilemap.prototype.collideObject = function(body) {
+    /*
+    var tiles = this.getTilesInRectangle(
+        body.hitbox.x,
+        body.hitbox.y,
+        body.hitbox.width,
+        body.hitbox.height
+    );
+    */
+    
+    var tiles = [];
+    tiles.push(this.getTileAtPosition(body['hitbox'].x, body['hitbox'].y));
+    tiles.push(this.getTileAtPosition(body['hitbox'].x + body['hitbox'].width, body['hitbox'].y));
+    tiles.push(this.getTileAtPosition(body['hitbox'].x, body['hitbox'].y + body['hitbox'].height));
+    tiles.push(this.getTileAtPosition(body['hitbox'].x + body['hitbox'].width, body['hitbox'].y + body['hitbox'].height));
+    
+    
+    for (var i = 0; i &lt; tiles.length; i++) {
+        if (tiles[i].tile.allowCollisions) {
+            
+            //tiles[i].x = ~~(body.hitbox.x / 16) * 16;
+            //tiles[i].y = ~~(body.hitbox.y / 16) * 16;
+            //tiles[i].x = tiles[i].x;
+            //tiles[i].y = tiles[i].y;
+            
+            tiles[i].tile.x = tiles[i].x;
+            tiles[i].tile.y = tiles[i].y;
+            tiles[i].tile.x = tiles[i].x;
+            tiles[i].tile.y = tiles[i].y;
+            
+            body.collide(tiles[i].tile);            
+        }
+    }
+};
+
+/**
+ * ...
+ *
+ * @return {number}
+ */
+rune.tilemap.Tilemap.prototype.getTileIndexAtPosition = function(x, y) {
+    if (this.m_layers != null) {
+        return this.m_layers.getTileIndexAtPosition(
+            x,
+            y
+        );
+    }
+    
+    return 0;
+};
+
+/**
+ * ...
+ *
+ * @return {Object}
+ */
+rune.tilemap.Tilemap.prototype.getTileAtPosition = function(x, y) {
+    var data = [];
+    var index = this.getTileIndexAtPosition(x, y);
+    
+    return {
+        x: ~~(x / 16) * 16,
+        y: ~~(y / 16) * 16,
+        tile: this.m_tiles.get(index)
+    };
+};
+
+/**
+ * ...
+ *
+ * @return {Array}
+ */
+rune.tilemap.Tilemap.prototype.getTileIndexesInRectangle = function(x, y, w, h) {
+    var tw = this.m_tileWidth;
+    var th = this.m_tileHeight;
+    
+    var cols = Math.ceil(w / tw) + 1; //@note: +1 for buffer tile.
+    var rows = Math.ceil(h / th) + 1; //@note: +1 for buffer tile.
+    var data = [];
+    
+    for (var r = 0; r &lt; rows; r++) {
+        data[r] = [];
+        for (var c = 0; c &lt; cols; c++) {
+            data[r][c] = this.getTileIndexAtPosition(
+                x + (c * tw),
+                y + (r * th)
+            );
+        }
+    }
+    
+    return data;
+};
+
+/**
+ * ...
+ *
+ * @return {Array}
+ */
+rune.tilemap.Tilemap.prototype.getTilesInRectangle = function(x, y, w, h) {
+    var data = [];
+    var indexes = this.getTileIndexesInRectangle(x, y, w, h);
+    
+    for (var r = 0; r &lt; indexes.length; r++) {
+        for (var c = 0; c &lt; indexes[r].length; c++) {
+            data.push(this.m_tiles.get(indexes[r][c]));
+        }
+    }
+    
+    return data;
+};
+
+/**
+ * ...
+ *
+ * @param {HTMLImageElement} texture ...
+ * @param {Array} map ...
+ * @param {number} [tileWidth=16] ...
+ * @param {number} [tileHeight=16] ...
+ *
+ * @return {undefined}
+ */
+rune.tilemap.Tilemap.prototype.load = function(texture, map, tileWidth, tileHeight) {
+    this.m_tileWidth  = tileWidth  || 16;
+    this.m_tileHeight = tileHeight || 16;
+    if (texture instanceof HTMLImageElement) {
+        this.m_texture = texture;
+        if (Array.isArray(map)) {
+            this.clear();
+            for (var i = 0; i &lt; map.length; i++) {
+                this.m_layers.add(map[i]);
+            }
+        } else throw new TypeError();
+    } else throw new TypeError();
+};
+
+//------------------------------------------------------------------------------
+// Public prototype methods (ENGINE)
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @return {undefined}
+ */
+rune.tilemap.Tilemap.prototype.dispose = function() {
+    
+};
+
+//------------------------------------------------------------------------------
+// Protected prototype methods
+//------------------------------------------------------------------------------
+
+/**
+ * The class constructor.
+ *
+ * @return {undefined}
+ * @protected
+ * @ignore
+ */
+rune.tilemap.Tilemap.prototype.m_construct = function() {
+    
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="rune.html">rune</a></li><li><a href="rune.animation.html">animation</a></li><li><a href="rune.camera.html">camera</a></li><li><a href="rune.color.html">color</a></li><li><a href="rune.data.html">data</a></li><li><a href="rune.display.html">display</a></li><li><a href="rune.game.html">game</a></li><li><a href="rune.geom.html">geom</a></li><li><a href="rune.input.html">input</a></li><li><a href="rune.media.html">media</a></li><li><a href="rune.net.html">net</a></li><li><a href="rune.physics.html">physics</a></li><li><a href="rune.resource.html">resource</a></li><li><a href="rune.scene.html">scene</a></li><li><a href="rune.screen.html">screen</a></li><li><a href="rune.state.html">state</a></li><li><a href="rune.system.html">system</a></li><li><a href="rune.text.html">text</a></li><li><a href="rune.tilemap.html">tilemap</a></li><li><a href="rune.timer.html">timer</a></li><li><a href="rune.tween.html">tween</a></li><li><a href="rune.ui.html">ui</a></li><li><a href="rune.util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="rune.animation.Animation.html">Animation</a></li><li><a href="rune.animation.Animations.html">Animations</a></li><li><a href="rune.camera.Camera.html">Camera</a></li><li><a href="rune.camera.CameraFade.html">CameraFade</a></li><li><a href="rune.camera.CameraFlash.html">CameraFlash</a></li><li><a href="rune.camera.Cameras.html">Cameras</a></li><li><a href="rune.camera.CameraShake.html">CameraShake</a></li><li><a href="rune.camera.CameraTargets.html">CameraTargets</a></li><li><a href="rune.camera.CameraTint.html">CameraTint</a></li><li><a href="rune.camera.CameraTintTween.html">CameraTintTween</a></li><li><a href="rune.camera.CameraViewport.html">CameraViewport</a></li><li><a href="rune.color.Color24.html">Color24</a></li><li><a href="rune.color.Color32.html">Color32</a></li><li><a href="rune.color.ColorComponent.html">ColorComponent</a></li><li><a href="rune.data.EngineManifest.html">EngineManifest</a></li><li><a href="rune.data.Highscores.html">Highscores</a></li><li><a href="rune.data.LogoIcon.html">LogoIcon</a></li><li><a href="rune.data.LogoText.html">LogoText</a></li><li><a href="rune.data.SceneBoot.html">SceneBoot</a></li><li><a href="rune.data.SceneBootDebug.html">SceneBootDebug</a></li><li><a href="rune.display.Canvas.html">Canvas</a></li><li><a href="rune.display.DisplayGroup.html">DisplayGroup</a></li><li><a href="rune.display.DisplayGroups.html">DisplayGroups</a></li><li><a href="rune.display.DisplayObject.html">DisplayObject</a></li><li><a href="rune.display.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="rune.display.Flicker.html">Flicker</a></li><li><a href="rune.display.Frame.html">Frame</a></li><li><a href="rune.display.Graphic.html">Graphic</a></li><li><a href="rune.display.Graphics.html">Graphics</a></li><li><a href="rune.display.Hitbox.html">Hitbox</a></li><li><a href="rune.display.InteractiveObject.html">InteractiveObject</a></li><li><a href="rune.display.Quadtree.html">Quadtree</a></li><li><a href="rune.display.RepeatedGraphic.html">RepeatedGraphic</a></li><li><a href="rune.display.Sprite.html">Sprite</a></li><li><a href="rune.display.Stage.html">Stage</a></li><li><a href="rune.display.Texture.html">Texture</a></li><li><a href="rune.game.Entity.html">Entity</a></li><li><a href="rune.geom.Point.html">Point</a></li><li><a href="rune.geom.Rectangle.html">Rectangle</a></li><li><a href="rune.geom.Vector2D.html">Vector2D</a></li><li><a href="rune.input.Gamepad.html">Gamepad</a></li><li><a href="rune.input.Gamepads.html">Gamepads</a></li><li><a href="rune.input.GamepadsOptions.html">GamepadsOptions</a></li><li><a href="rune.input.Inputs.html">Inputs</a></li><li><a href="rune.input.Keyboard.html">Keyboard</a></li><li><a href="rune.input.KeyboardKey.html">KeyboardKey</a></li><li><a href="rune.input.KeyboardOptions.html">KeyboardOptions</a></li><li><a href="rune.input.Mouse.html">Mouse</a></li><li><a href="rune.input.MouseButton.html">MouseButton</a></li><li><a href="rune.input.MouseOptions.html">MouseOptions</a></li><li><a href="rune.media.Sound.html">Sound</a></li><li><a href="rune.media.SoundChannel.html">SoundChannel</a></li><li><a href="rune.media.Sounds.html">Sounds</a></li><li><a href="rune.net.URLLoader.html">URLLoader</a></li><li><a href="rune.net.URLRequest.html">URLRequest</a></li><li><a href="rune.net.URLResponse.html">URLResponse</a></li><li><a href="rune.physics.Body.html">Body</a></li><li><a href="rune.physics.Space.html">Space</a></li><li><a href="rune.physics.Velocity.html">Velocity</a></li><li><a href="rune.resource.Cache.html">Cache</a></li><li><a href="rune.resource.Encoder.html">Encoder</a></li><li><a href="rune.resource.Manifest.html">Manifest</a></li><li><a href="rune.resource.Resources.html">Resources</a></li><li><a href="rune.resource.Storage.html">Storage</a></li><li><a href="rune.scene.Scene.html">Scene</a></li><li><a href="rune.scene.Scenes.html">Scenes</a></li><li><a href="rune.screen.Screen.html">Screen</a></li><li><a href="rune.state.State.html">State</a></li><li><a href="rune.state.States.html">States</a></li><li><a href="rune.system.Config.html">Config</a></li><li><a href="rune.system.Main.html">Main</a></li><li><a href="rune.system.Time.html">Time</a></li><li><a href="rune.text.BitmapField.html">BitmapField</a></li><li><a href="rune.text.BitmapFormat.html">BitmapFormat</a></li><li><a href="rune.tilemap.Tile.html">Tile</a></li><li><a href="rune.tilemap.Tilemap.html">Tilemap</a></li><li><a href="rune.tilemap.TilemapLayer.html">TilemapLayer</a></li><li><a href="rune.tilemap.TilemapLayers.html">TilemapLayers</a></li><li><a href="rune.tilemap.Tiles.html">Tiles</a></li><li><a href="rune.timer.Timer.html">Timer</a></li><li><a href="rune.timer.TimerOptions.html">TimerOptions</a></li><li><a href="rune.timer.Timers.html">Timers</a></li><li><a href="rune.tween.Back.html">Back</a></li><li><a href="rune.tween.Bounce.html">Bounce</a></li><li><a href="rune.tween.Circular.html">Circular</a></li><li><a href="rune.tween.Cubic.html">Cubic</a></li><li><a href="rune.tween.Expo.html">Expo</a></li><li><a href="rune.tween.Linear.html">Linear</a></li><li><a href="rune.tween.Quad.html">Quad</a></li><li><a href="rune.tween.Quart.html">Quart</a></li><li><a href="rune.tween.Quint.html">Quint</a></li><li><a href="rune.tween.Sine.html">Sine</a></li><li><a href="rune.tween.Tween.html">Tween</a></li><li><a href="rune.tween.TweenProp.html">TweenProp</a></li><li><a href="rune.tween.Tweens.html">Tweens</a></li><li><a href="rune.ui.Button.html">Button</a></li><li><a href="rune.ui.Console.html">Console</a></li><li><a href="rune.ui.ConsoleCommand.html">ConsoleCommand</a></li><li><a href="rune.ui.ConsoleCommands.html">ConsoleCommands</a></li><li><a href="rune.ui.ConsoleCursor.html">ConsoleCursor</a></li><li><a href="rune.ui.ConsoleHistory.html">ConsoleHistory</a></li><li><a href="rune.ui.ConsoleInput.html">ConsoleInput</a></li><li><a href="rune.ui.ConsoleManager.html">ConsoleManager</a></li><li><a href="rune.ui.ConsoleOutput.html">ConsoleOutput</a></li><li><a href="rune.ui.Counter.html">Counter</a></li><li><a href="rune.ui.CounterDigit.html">CounterDigit</a></li><li><a href="rune.ui.Debugger.html">Debugger</a></li><li><a href="rune.ui.Framerate.html">Framerate</a></li><li><a href="rune.ui.FramerateHistogram.html">FramerateHistogram</a></li><li><a href="rune.ui.FramerateHistogramBar.html">FramerateHistogramBar</a></li><li><a href="rune.ui.Memory.html">Memory</a></li><li><a href="rune.ui.MouseCursor.html">MouseCursor</a></li><li><a href="rune.ui.Progressbar.html">Progressbar</a></li><li><a href="rune.ui.RenderBudget.html">RenderBudget</a></li><li><a href="rune.ui.TextButton.html">TextButton</a></li><li><a href="rune.ui.UpdateBudget.html">UpdateBudget</a></li><li><a href="rune.util.DataURL.html">DataURL</a></li><li><a href="rune.util.Event.html">Event</a></li><li><a href="rune.util.Executable.html">Executable</a></li><li><a href="rune.util.Filter.html">Filter</a></li><li><a href="rune.util.Math.html">Math</a></li><li><a href="rune.util.Stack.html">Stack</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Mar 24 2021 22:09:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        
+        <title>Rune (bin-debug)</title>
+        
+        <link rel="stylesheet" type="text/css" href="./../bin/style.css">
+        
+        <!-- SOFTWARE DEVELOPMENT KIT -->
+        <script src="../scripts/javascript/RuneRuntimeCompiler.js"></script>
+        
+        <!-- BOOTSTRAP -->
+        <script>
+        
+            new RuneRuntimeCompiler(
+                function() {
+                    this.add("scope/Manifest.js");
+                    this.add("data/manifest/Manifest.js");
+                    this.add("data/sprite/astronaut/Astronaut.js");
+                    this.add("data/sprite/astronaut/Astronauts.js");
+                    this.add("data/sprite/gamepad/Gamepad.js");
+                    this.add("data/sprite/gamepad/GamepadButton.js");
+                    this.add("scene/Scene000.js");
+                    this.add("scene/Scene001.js");
+                    this.add("scene/Scene002.js");
+                    this.add("system/Main.js");
+                    this.add("scope/Alias.js");
+                },
+                function() {
+                    var app = new demo.system.Main();
+                        app.start();
+                        console.log(app);
+                    /*
+                    setTimeout(function() {
+                        app.stop();
+                    }, 30000);
+                    */
+                }
+            );
+            
+        </script>
+        
+    </head>
+    
+</html>

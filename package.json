@@ -1,0 +1,17 @@
+{
+  "name": "rune",
+  "version": "0.0.0",
+  "description": "Yet Another JavaScript Game Engine",
+  "main": "",
+  "scripts": {
+    "test": "electron ./bin-debug/bootstrap.js",
+    "start": "electron ./bin/bootstrap.js"
+  },
+  "author": "Henrik Andersen",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^9.1.0",
+    "google-closure-compiler": "^20200628.0.0",
+    "jsdoc": "^3.6.6"
+  }
+}

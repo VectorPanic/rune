@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: util/Math.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: util/Math.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//------------------------------------------------------------------------------
+// Constructor scope
+//------------------------------------------------------------------------------
+
+/**
+ * Creates a new instance of the class.
+ *
+ * @constructor
+ *
+ * @class
+ * @classdesc
+ *
+ * TODO: ...
+ */
+rune.util.Math = function() {
+    console.warn("This class is not meant to be instantiated; all content is static.");
+};
+
+//------------------------------------------------------------------------------
+// Public static constants
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @constant {number}
+ * @default 0.01745329251
+ */
+rune.util.Math.DEG_TO_RAD = Math.PI / 180.0;
+
+/**
+ * ...
+ *
+ * @constant {number}
+ */
+rune.util.Math.RAD_TO_DEG = 180.0 / Math.PI;
+
+//------------------------------------------------------------------------------
+// Public static methods
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ * 
+ * @param {number} n ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.abs = function(n) {
+    return (n > 0) ? n : -n;
+};
+
+/**
+ * ...
+ *
+ * @param {number} n ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.avg = function(n) {
+    var sum = 0;
+    var i = n;
+    while (i--) {
+        sum += (n[i]);
+    }
+    
+    return sum / n;
+};
+
+/**
+ * ...
+ *
+ * @param {number} n ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.ceil = function(n) {
+    var t = ~~n;
+    return (t === n) ? n : (n > 0) ? (t + 1) : (t - 1);
+};
+
+/**
+ * ...
+ *
+ * @param {number} n ...
+ * 
+ * @returns {boolean} ...
+ */
+rune.util.Math.chance = function(n) {
+    n = n || 50;
+    n = Math.min(n, 100);
+    n = Math.max(n,   0);
+
+    return n >= Math.random() * 100;
+};
+
+/**
+ * TODO: ...
+ *
+ * @param {number} num ...
+ * @param {number} min ...
+ * @param {number} max ...
+ * 
+ * @return {number} ...
+ */
+rune.util.Math.clamp = function(num, min, max) {
+    return Math.min(Math.max(num, min), max);
+};
+
+/**
+ * ...
+ *
+ * @param {number} n ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.cos = function(n) {
+    return rune.util.Math.sin(n + 1.570796327);
+};
+
+/**
+ * ...
+ *
+ * @param {number} angle ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.degreesToRadians = function(angle) {
+    return angle * rune.util.Math.DEG_TO_RAD;
+};
+
+/**
+ * ...
+ * 
+ * @param {number} a ...
+ * @param {number} b ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.diff = function(a, b) {
+    return Math.abs(a - b);
+};
+
+/**
+ * ...
+ * 
+ * @param {number} x1 ...
+ * @param {number} y1 ...
+ * @param {number} x2 ...
+ * @param {number} y2 ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.distance = function(x1, y1, x2, y2) {
+    var a = x1 - x2;
+    var b = y1 - y2;
+
+    return Math.sqrt(a * a + b * b);
+};
+
+/**
+ * ...
+ *
+ * @param {number} n ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.floor = function(n) {
+    return ~~n;
+};
+
+/**
+ * ...
+ *
+ * @param {number} bytes ...
+ * @param {number} decimals ...
+ * 
+ * @returns {string} ...
+ */
+rune.util.Math.formatBytes = function(bytes, decimals) {
+    decimals = decimals || 2;
+
+    if (bytes === 0) return "0 Bytes";
+
+    var k     = 1024;
+    var dm    = decimals &lt; 0 ? 0 : decimals;
+    var sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    var i     = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+};
+
+/**
+ * TODO: ...
+ * 
+ * @param {number} num ...
+ * @param {number} max ...
+ * 
+ * @return {number} ...
+ */
+rune.util.Math.percentDec = function(num, max) {
+    return rune.util.Math.clamp(1 - (num / max), 0, 1);
+};
+
+/**
+ * ...
+ * 
+ * @param {number} num ...
+ * @param {number} max ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.percentInc = function(num, max) {
+    return rune.util.Math.clamp((num / max), 0, 1);
+};
+
+/**
+ * ...
+ * 
+ * @param {number} n ...
+ * 
+ * @returns {boolean} ...
+ */
+rune.util.Math.isEven = function(n) {
+    return (parseInt(n, 10) &amp; 1) === 0;
+};
+
+/**
+ * ...
+ *
+ * @param {number} n ...
+ * 
+ * @returns {boolean} ...
+ */
+rune.util.Math.isOdd = function(n) {
+    return (parseInt(n, 10) &amp; 1) !== 0;
+};
+
+/**
+ * ...
+ * 
+ * @param {number} n ...
+ * 
+ * @returns {boolean} ...
+ */
+rune.util.Math.isPowerOfTwo = function(n) {
+    return (n &amp; (n - 1)) === 0;
+};
+
+/**
+ * ...
+ *
+ * @param {number} min ...
+ * @param {number} max ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.random = function(min, max) {
+    min = (typeof min === "number") ? min : Number.MIN_VALUE;
+    max = (typeof max === "number") ? max : Number.MAX_VALUE;
+    
+    return Math.random() * (max - min) + min;
+};
+
+/**
+ * ...
+ *
+ * @param {number} min ...
+ * @param {number} max ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.randomInt = function(min, max) {
+    min = (typeof min === "number") ? min : Number.MIN_VALUE;
+    max = (typeof max === "number") ? max : Number.MAX_VALUE;
+
+    return Math.round((Math.random() * (max - min)) + min);
+};
+
+/**
+ * ...
+ *
+ * @param {number} radians ...
+ * 
+ * @return {number} ...
+ */
+rune.util.Math.radiansToDegrees = function(radians) {
+    return radians * rune.util.Math.RAD_TO_DEG;
+};
+
+/**
+ * ...
+ * 
+ * @param {number} n ...
+ * 
+ * @return {number} ...
+ */
+rune.util.Math.sin = function(n) {
+    n *= 0.3183098862;
+
+    if (n > 1) {
+        n -= (Math.ceil( n) >> 1) &lt;&lt; 1;
+    } else if (n &lt; -1) {
+        n += (Math.ceil(-n) >> 1) &lt;&lt; 1;
+    }
+
+    if (n > 0) {
+        return n * (3.1 + n * (0.5 + n * (-7.2 + n * 3.6)));
+    } else {
+        return n * (3.1 - n * (0.5 + n * ( 7.2 + n * 3.6)));
+    }
+};
+
+/**
+ * TODO: ...
+ *
+ * @param {number} num ...
+ * @param {number} min ...
+ * @param {number} max ...
+ * 
+ * @returns {number} ...
+ */
+rune.util.Math.wrap = function(num, min, max) {
+    var range = max - min + 1;
+
+    if (num &lt; min) {
+        num += range * parseInt(((min - num) / range + 1), 10);
+    }
+
+    return min + (num - min) % range;
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="rune.html">rune</a></li><li><a href="rune.animation.html">animation</a></li><li><a href="rune.camera.html">camera</a></li><li><a href="rune.color.html">color</a></li><li><a href="rune.data.html">data</a></li><li><a href="rune.display.html">display</a></li><li><a href="rune.game.html">game</a></li><li><a href="rune.geom.html">geom</a></li><li><a href="rune.input.html">input</a></li><li><a href="rune.media.html">media</a></li><li><a href="rune.net.html">net</a></li><li><a href="rune.physics.html">physics</a></li><li><a href="rune.resource.html">resource</a></li><li><a href="rune.scene.html">scene</a></li><li><a href="rune.screen.html">screen</a></li><li><a href="rune.state.html">state</a></li><li><a href="rune.system.html">system</a></li><li><a href="rune.text.html">text</a></li><li><a href="rune.tilemap.html">tilemap</a></li><li><a href="rune.timer.html">timer</a></li><li><a href="rune.tween.html">tween</a></li><li><a href="rune.ui.html">ui</a></li><li><a href="rune.util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="rune.animation.Animation.html">Animation</a></li><li><a href="rune.animation.Animations.html">Animations</a></li><li><a href="rune.camera.Camera.html">Camera</a></li><li><a href="rune.camera.CameraFade.html">CameraFade</a></li><li><a href="rune.camera.CameraFlash.html">CameraFlash</a></li><li><a href="rune.camera.Cameras.html">Cameras</a></li><li><a href="rune.camera.CameraShake.html">CameraShake</a></li><li><a href="rune.camera.CameraTargets.html">CameraTargets</a></li><li><a href="rune.camera.CameraTint.html">CameraTint</a></li><li><a href="rune.camera.CameraTintTween.html">CameraTintTween</a></li><li><a href="rune.camera.CameraViewport.html">CameraViewport</a></li><li><a href="rune.color.Color24.html">Color24</a></li><li><a href="rune.color.Color32.html">Color32</a></li><li><a href="rune.color.ColorComponent.html">ColorComponent</a></li><li><a href="rune.data.EngineManifest.html">EngineManifest</a></li><li><a href="rune.data.Highscores.html">Highscores</a></li><li><a href="rune.data.LogoIcon.html">LogoIcon</a></li><li><a href="rune.data.LogoText.html">LogoText</a></li><li><a href="rune.data.SceneBoot.html">SceneBoot</a></li><li><a href="rune.data.SceneBootDebug.html">SceneBootDebug</a></li><li><a href="rune.display.Canvas.html">Canvas</a></li><li><a href="rune.display.DisplayGroup.html">DisplayGroup</a></li><li><a href="rune.display.DisplayGroups.html">DisplayGroups</a></li><li><a href="rune.display.DisplayObject.html">DisplayObject</a></li><li><a href="rune.display.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="rune.display.Flicker.html">Flicker</a></li><li><a href="rune.display.Frame.html">Frame</a></li><li><a href="rune.display.Graphic.html">Graphic</a></li><li><a href="rune.display.Graphics.html">Graphics</a></li><li><a href="rune.display.Hitbox.html">Hitbox</a></li><li><a href="rune.display.InteractiveObject.html">InteractiveObject</a></li><li><a href="rune.display.Quadtree.html">Quadtree</a></li><li><a href="rune.display.RepeatedGraphic.html">RepeatedGraphic</a></li><li><a href="rune.display.Sprite.html">Sprite</a></li><li><a href="rune.display.Stage.html">Stage</a></li><li><a href="rune.display.Texture.html">Texture</a></li><li><a href="rune.game.Entity.html">Entity</a></li><li><a href="rune.geom.Point.html">Point</a></li><li><a href="rune.geom.Rectangle.html">Rectangle</a></li><li><a href="rune.geom.Vector2D.html">Vector2D</a></li><li><a href="rune.input.Gamepad.html">Gamepad</a></li><li><a href="rune.input.Gamepads.html">Gamepads</a></li><li><a href="rune.input.GamepadsOptions.html">GamepadsOptions</a></li><li><a href="rune.input.Inputs.html">Inputs</a></li><li><a href="rune.input.Keyboard.html">Keyboard</a></li><li><a href="rune.input.KeyboardKey.html">KeyboardKey</a></li><li><a href="rune.input.KeyboardOptions.html">KeyboardOptions</a></li><li><a href="rune.input.Mouse.html">Mouse</a></li><li><a href="rune.input.MouseButton.html">MouseButton</a></li><li><a href="rune.input.MouseOptions.html">MouseOptions</a></li><li><a href="rune.media.Sound.html">Sound</a></li><li><a href="rune.media.SoundChannel.html">SoundChannel</a></li><li><a href="rune.media.Sounds.html">Sounds</a></li><li><a href="rune.net.URLLoader.html">URLLoader</a></li><li><a href="rune.net.URLRequest.html">URLRequest</a></li><li><a href="rune.net.URLResponse.html">URLResponse</a></li><li><a href="rune.physics.Body.html">Body</a></li><li><a href="rune.physics.Space.html">Space</a></li><li><a href="rune.physics.Velocity.html">Velocity</a></li><li><a href="rune.resource.Cache.html">Cache</a></li><li><a href="rune.resource.Encoder.html">Encoder</a></li><li><a href="rune.resource.Manifest.html">Manifest</a></li><li><a href="rune.resource.Resources.html">Resources</a></li><li><a href="rune.resource.Storage.html">Storage</a></li><li><a href="rune.scene.Scene.html">Scene</a></li><li><a href="rune.scene.Scenes.html">Scenes</a></li><li><a href="rune.screen.Screen.html">Screen</a></li><li><a href="rune.state.State.html">State</a></li><li><a href="rune.state.States.html">States</a></li><li><a href="rune.system.Config.html">Config</a></li><li><a href="rune.system.Main.html">Main</a></li><li><a href="rune.system.Time.html">Time</a></li><li><a href="rune.text.BitmapField.html">BitmapField</a></li><li><a href="rune.text.BitmapFormat.html">BitmapFormat</a></li><li><a href="rune.tilemap.Tile.html">Tile</a></li><li><a href="rune.tilemap.Tilemap.html">Tilemap</a></li><li><a href="rune.tilemap.TilemapLayer.html">TilemapLayer</a></li><li><a href="rune.tilemap.TilemapLayers.html">TilemapLayers</a></li><li><a href="rune.tilemap.Tiles.html">Tiles</a></li><li><a href="rune.timer.Timer.html">Timer</a></li><li><a href="rune.timer.TimerOptions.html">TimerOptions</a></li><li><a href="rune.timer.Timers.html">Timers</a></li><li><a href="rune.tween.Back.html">Back</a></li><li><a href="rune.tween.Bounce.html">Bounce</a></li><li><a href="rune.tween.Circular.html">Circular</a></li><li><a href="rune.tween.Cubic.html">Cubic</a></li><li><a href="rune.tween.Expo.html">Expo</a></li><li><a href="rune.tween.Linear.html">Linear</a></li><li><a href="rune.tween.Quad.html">Quad</a></li><li><a href="rune.tween.Quart.html">Quart</a></li><li><a href="rune.tween.Quint.html">Quint</a></li><li><a href="rune.tween.Sine.html">Sine</a></li><li><a href="rune.tween.Tween.html">Tween</a></li><li><a href="rune.tween.TweenProp.html">TweenProp</a></li><li><a href="rune.tween.Tweens.html">Tweens</a></li><li><a href="rune.ui.Button.html">Button</a></li><li><a href="rune.ui.Console.html">Console</a></li><li><a href="rune.ui.ConsoleCommand.html">ConsoleCommand</a></li><li><a href="rune.ui.ConsoleCommands.html">ConsoleCommands</a></li><li><a href="rune.ui.ConsoleCursor.html">ConsoleCursor</a></li><li><a href="rune.ui.ConsoleHistory.html">ConsoleHistory</a></li><li><a href="rune.ui.ConsoleInput.html">ConsoleInput</a></li><li><a href="rune.ui.ConsoleManager.html">ConsoleManager</a></li><li><a href="rune.ui.ConsoleOutput.html">ConsoleOutput</a></li><li><a href="rune.ui.Counter.html">Counter</a></li><li><a href="rune.ui.CounterDigit.html">CounterDigit</a></li><li><a href="rune.ui.Debugger.html">Debugger</a></li><li><a href="rune.ui.Framerate.html">Framerate</a></li><li><a href="rune.ui.FramerateHistogram.html">FramerateHistogram</a></li><li><a href="rune.ui.FramerateHistogramBar.html">FramerateHistogramBar</a></li><li><a href="rune.ui.Memory.html">Memory</a></li><li><a href="rune.ui.MouseCursor.html">MouseCursor</a></li><li><a href="rune.ui.Progressbar.html">Progressbar</a></li><li><a href="rune.ui.RenderBudget.html">RenderBudget</a></li><li><a href="rune.ui.TextButton.html">TextButton</a></li><li><a href="rune.ui.UpdateBudget.html">UpdateBudget</a></li><li><a href="rune.util.DataURL.html">DataURL</a></li><li><a href="rune.util.Event.html">Event</a></li><li><a href="rune.util.Executable.html">Executable</a></li><li><a href="rune.util.Filter.html">Filter</a></li><li><a href="rune.util.Math.html">Math</a></li><li><a href="rune.util.Stack.html">Stack</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Mar 24 2021 22:09:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

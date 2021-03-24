@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: display/Palette.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: display/Palette.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>
+//------------------------------------------------------------------------------
+// Constructor scope
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @constructor
+ *
+ * @param {boolean} [dither=false] ...
+ *
+ * @class
+ * @classdesc
+ * 
+ * ...
+ */
+rune.display.Palette = function(dither) {
+    
+    //--------------------------------------------------------------------------
+    // Public properties
+    //--------------------------------------------------------------------------
+
+    /**
+     * ...
+     *
+     * @type {boolean}
+     * @default false
+     */
+    this.dither = dither || false;
+    
+    //--------------------------------------------------------------------------
+    // Private properties
+    //--------------------------------------------------------------------------
+
+    /**
+     * ...
+     *
+     * @type {Array.&lt;string>}
+     * @private
+     */
+    this.m_colors = [];
+    
+    //--------------------------------------------------------------------------
+    // Constructor call
+    //--------------------------------------------------------------------------
+
+    /**
+     * ...
+     */
+    this.m_construct();
+};
+
+//------------------------------------------------------------------------------
+// Public prototype getter and setter methods
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @member {number} numColors
+ * @memberof rune.display.Palette
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.display.Palette.prototype, "numColors", {
+    /**
+     * @this rune.display.Palette
+     * @ignore
+     */
+    get : function() {
+        return this.m_colors.length;
+    }
+});
+
+/**
+ * ...
+ *
+ * @member {number} bitDepth
+ * @memberof rune.display.Palette
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.display.Palette.prototype, "bitDepth", {
+    /**
+     * @this rune.display.Palette
+     * @ignore
+     */
+    get : function() {
+        return Math.sqrt(this.m_colors.length);
+    }
+});
+
+//------------------------------------------------------------------------------
+// Public prototype methods (API)
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @param {string} color ...
+ *
+ * @return {undefined}
+ */
+rune.display.Palette.prototype.add = function(color) {
+    if (typeof color === "string") this.m_colors.push(color);
+    else throw new Error("Color must be of data type String.");
+};
+
+/**
+ * Converts 24/32-bit color to appropriate color from predefined palette.
+ *
+ * @param {Array} color RGB color components.
+ * 
+ * @return {number} Palette color value in hex.
+ */
+rune.display.Palette.prototype.convert = function(color) {
+    var c1 = color;
+    var c2 = null;
+
+    var dis;            // Current color difference (distance between direct and indirect color).
+    var min = Infinity; // Lowest possible distance, ie best color selection. 
+    var num = 0;        // Choice of indirect color.
+
+    for (var i = 0; i &lt; this.m_colors.length; i++) {
+        c2 = rune.color.Color24.fromHex(this.m_colors[i]);
+
+        dis = Math.sqrt(
+            Math.pow(c1['r']['value'] - c2['r']['value'], 2) +
+            Math.pow(c1['g']['value'] - c2['g']['value'], 2) +
+            Math.pow(c1['g']['value'] - c2['g']['value'], 2)
+        );
+
+        if (dis &lt; min) {
+            min = dis;
+            num = i;
+        }
+    }
+
+    return this.m_colors[num];
+};
+
+//------------------------------------------------------------------------------
+// Protected prototype methods
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @return {undefined}
+ * @protected
+ * @ignore
+ */
+rune.display.Palette.prototype.m_construct = function() {
+    //@note: Override from child class
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="rune.html">rune</a></li><li><a href="rune.animation.html">animation</a></li><li><a href="rune.camera.html">camera</a></li><li><a href="rune.color.html">color</a></li><li><a href="rune.data.html">data</a></li><li><a href="rune.display.html">display</a></li><li><a href="rune.geom.html">geom</a></li><li><a href="rune.input.html">input</a></li><li><a href="rune.net.html">net</a></li><li><a href="rune.resource.html">resource</a></li><li><a href="rune.scene.html">scene</a></li><li><a href="rune.screen.html">screen</a></li><li><a href="rune.state.html">state</a></li><li><a href="rune.system.html">system</a></li><li><a href="rune.timer.html">timer</a></li><li><a href="rune.tween.html">tween</a></li><li><a href="rune.ui.html">ui</a></li><li><a href="rune.util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="rune.animation.Animation.html">Animation</a></li><li><a href="rune.animation.Animations.html">Animations</a></li><li><a href="rune.camera.Camera.html">Camera</a></li><li><a href="rune.camera.CameraFade.html">CameraFade</a></li><li><a href="rune.camera.CameraFlash.html">CameraFlash</a></li><li><a href="rune.camera.Cameras.html">Cameras</a></li><li><a href="rune.camera.CameraShake.html">CameraShake</a></li><li><a href="rune.camera.CameraTargets.html">CameraTargets</a></li><li><a href="rune.camera.CameraTint.html">CameraTint</a></li><li><a href="rune.camera.CameraTintTween.html">CameraTintTween</a></li><li><a href="rune.camera.CameraViewport.html">CameraViewport</a></li><li><a href="rune.color.Color24.html">Color24</a></li><li><a href="rune.color.Color32.html">Color32</a></li><li><a href="rune.color.ColorComponent.html">ColorComponent</a></li><li><a href="rune.data.EngineManifest.html">EngineManifest</a></li><li><a href="rune.data.Logo.html">Logo</a></li><li><a href="rune.data.SceneBoot.html">SceneBoot</a></li><li><a href="rune.data.SceneBootDebug.html">SceneBootDebug</a></li><li><a href="rune.display.Canvas.html">Canvas</a></li><li><a href="rune.display.DisplayObject.html">DisplayObject</a></li><li><a href="rune.display.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="rune.display.Frame.html">Frame</a></li><li><a href="rune.display.Graphic.html">Graphic</a></li><li><a href="rune.display.Graphics.html">Graphics</a></li><li><a href="rune.display.InteractiveObject.html">InteractiveObject</a></li><li><a href="rune.display.Palette.html">Palette</a></li><li><a href="rune.display.Palettes.html">Palettes</a></li><li><a href="rune.display.RepeatedGraphic.html">RepeatedGraphic</a></li><li><a href="rune.display.Sprite.html">Sprite</a></li><li><a href="rune.display.Stage.html">Stage</a></li><li><a href="rune.display.Texture.html">Texture</a></li><li><a href="rune.geom.Point.html">Point</a></li><li><a href="rune.geom.Rectangle.html">Rectangle</a></li><li><a href="rune.input.Gamepad.html">Gamepad</a></li><li><a href="rune.input.Gamepads.html">Gamepads</a></li><li><a href="rune.input.GamepadsOptions.html">GamepadsOptions</a></li><li><a href="rune.input.Inputs.html">Inputs</a></li><li><a href="rune.input.Keyboard.html">Keyboard</a></li><li><a href="rune.input.KeyboardKey.html">KeyboardKey</a></li><li><a href="rune.input.KeyboardOptions.html">KeyboardOptions</a></li><li><a href="rune.input.Mouse.html">Mouse</a></li><li><a href="rune.input.MouseButton.html">MouseButton</a></li><li><a href="rune.input.MouseOptions.html">MouseOptions</a></li><li><a href="rune.net.URLLoader.html">URLLoader</a></li><li><a href="rune.net.URLRequest.html">URLRequest</a></li><li><a href="rune.net.URLResponse.html">URLResponse</a></li><li><a href="rune.resource.Cache.html">Cache</a></li><li><a href="rune.resource.Encoder.html">Encoder</a></li><li><a href="rune.resource.Manifest.html">Manifest</a></li><li><a href="rune.resource.Resources.html">Resources</a></li><li><a href="rune.resource.Storage.html">Storage</a></li><li><a href="rune.scene.Scene.html">Scene</a></li><li><a href="rune.scene.Scenes.html">Scenes</a></li><li><a href="rune.screen.Screen.html">Screen</a></li><li><a href="rune.state.State.html">State</a></li><li><a href="rune.state.States.html">States</a></li><li><a href="rune.system.Config.html">Config</a></li><li><a href="rune.system.Main.html">Main</a></li><li><a href="rune.system.Time.html">Time</a></li><li><a href="rune.timer.Timer.html">Timer</a></li><li><a href="rune.timer.TimerOptions.html">TimerOptions</a></li><li><a href="rune.timer.Timers.html">Timers</a></li><li><a href="rune.tween.Back.html">Back</a></li><li><a href="rune.tween.Bounce.html">Bounce</a></li><li><a href="rune.tween.Circular.html">Circular</a></li><li><a href="rune.tween.Cubic.html">Cubic</a></li><li><a href="rune.tween.Expo.html">Expo</a></li><li><a href="rune.tween.Linear.html">Linear</a></li><li><a href="rune.tween.Quad.html">Quad</a></li><li><a href="rune.tween.Quart.html">Quart</a></li><li><a href="rune.tween.Quint.html">Quint</a></li><li><a href="rune.tween.Sine.html">Sine</a></li><li><a href="rune.tween.Tween.html">Tween</a></li><li><a href="rune.tween.TweenProp.html">TweenProp</a></li><li><a href="rune.tween.Tweens.html">Tweens</a></li><li><a href="rune.ui.Progressbar.html">Progressbar</a></li><li><a href="rune.util.DataURL.html">DataURL</a></li><li><a href="rune.util.Event.html">Event</a></li><li><a href="rune.util.Executable.html">Executable</a></li><li><a href="rune.util.Math.html">Math</a></li><li><a href="rune.util.Stack.html">Stack</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Jan 25 2021 20:40:08 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: input/keyboard/Keyboard.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: input/keyboard/Keyboard.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//------------------------------------------------------------------------------
+// Constructor scope
+//------------------------------------------------------------------------------
+
+/** 
+ * Creates a new keyboard object.
+ * 
+ * @constructor
+ *
+ * @param {Object} [options] Keyboard settings.
+ *
+ * @class
+ * @classdesc
+ * 
+ * System for managing input via physical keyboard.
+ */
+rune.input.Keyboard = function(options) {
+    
+    //--------------------------------------------------------------------------
+    // Protected properties
+    //--------------------------------------------------------------------------
+
+    /**
+     * Settings for the current keyboard.
+     *
+     * @type {rune.input.KeyboardOptions}
+     * @protected
+     * @ignore
+     */
+    this.m_options = new rune.input.KeyboardOptions(options);
+    
+    /**
+     * Whether the keyboard is enabled or not.
+     *
+     * @type {boolean}
+     * @protected
+     * @ignore
+     */
+    this.m_enabled = this.m_options.enable;
+
+    /**
+     * Lookup Table for the keys.
+     *
+     * @type {Object}
+     * @protected
+     * @ignore
+     */
+    this.m_LUT = {};
+
+    /**
+     * Register of possible keys.
+     *
+     * @type {Array}
+     * @protected
+     * @ignore
+     */
+    this.m_keys = new Array(rune.input.Keyboard.NUM_KEYS);
+
+    /**
+     * Reference to event handler.
+     *
+     * @type {Function}
+     * @protected
+     * @ignore
+     */
+    this.m_onKeyDownHandler = null;
+
+    /**
+     * Reference to event handler.
+     *
+     * @type {Function}
+     * @protected
+     * @ignore
+     */
+    this.m_onKeyUpHandler = null;
+    
+    //--------------------------------------------------------------------------
+    // Constructor call
+    //--------------------------------------------------------------------------
+
+    /**
+     * Call for dedicated constructor method.
+     */
+    this.m_construct();
+};
+
+//------------------------------------------------------------------------------
+// Public static constants
+//------------------------------------------------------------------------------
+
+/**
+ * Number of keys.
+ * 
+ * @constant {number}
+ */
+rune.input.Keyboard.NUM_KEYS = 256;
+
+//------------------------------------------------------------------------------
+// Public prototype getter and setter methods
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @member {boolean} enabled
+ * @memberof rune.input.Keyboard
+ * @instance
+ */
+Object.defineProperty(rune.input.Keyboard.prototype, "enabled", {
+    /**
+     * ... 
+     *
+     * @this rune.input.Keyboard
+     * @ignore
+     */
+    get : function() {
+        return this.m_enabled;
+    },
+
+    /**
+     * ... 
+     *
+     * @this rune.input.Keyboard
+     * @ignore
+     */
+    set : function(value) {
+        if (this.m_enabled != value) {
+            this.m_enabled  = value;
+            
+            if (this.m_enabled == true) this.m_constructEvent();
+            else this.m_disposeEvent();
+        }
+    }
+});
+
+//------------------------------------------------------------------------------
+// Public prototype methods (API)
+//------------------------------------------------------------------------------
+
+/**
+ * Check if the key was just pressed.
+ *
+ * @param {string} key A valid key, such as "SPACE".
+ * 
+ * @returns {boolean}
+ */
+rune.input.Keyboard.prototype.justPressed = function(key) {
+    key = key.toUpperCase();
+    if (this.m_keys[this.m_LUT[key]] != null) return this.m_keys[this.m_LUT[key]].isJustPressed();
+    else return false;
+};
+
+/**
+ * Check if the key was just released.
+ *
+ * @param {string} key A valid key, such as "SPACE".
+ * 
+ * @returns {boolean}
+ */
+rune.input.Keyboard.prototype.justReleased = function(key) {
+    key = key.toUpperCase();
+    if (this.m_keys[this.m_LUT[key]] != null) return this.m_keys[this.m_LUT[key]].isJustReleased();
+    else return false;
+};
+
+/**
+ * Check if the key is pressed.
+ *
+ * @param {string} key A valid key, such as "SPACE".
+ * 
+ * @returns {boolean}
+ */
+rune.input.Keyboard.prototype.pressed = function(key) {
+    key = key.toUpperCase();
+    if (this.m_keys[this.m_LUT[key]] != null) return this.m_keys[this.m_LUT[key]].isPressed();
+    else return false;
+};
+
+/**
+ * Reset the state of all keys.
+ *
+ * @returns {undefined}
+ */
+rune.input.Keyboard.prototype.reset = function() {
+    var i = this.m_keys.length;
+    while (i--) {
+        var key = this.m_keys[i];
+        if (key != null) {
+            key.reset();
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+// Public prototype methods (Engine)
+//------------------------------------------------------------------------------
+
+/**
+ * Updates the state of all keys.
+ *
+ * @returns {undefined}
+ */
+rune.input.Keyboard.prototype.update = function() {
+    if (this.m_enabled == true) {
+        this.m_updateKeys();
+    }
+};
+
+/**
+ * Disables the keyboard and frees up allocated memory.
+ * 
+ * @returns {undefined}
+ */
+rune.input.Keyboard.prototype.dispose = function() {
+    
+    console.log("Terminate Keyboard.");
+    
+    this.m_disposeEvent();
+    this.m_disposeKeys();
+};
+
+//------------------------------------------------------------------------------
+// Protected prototype methods
+//------------------------------------------------------------------------------
+
+/**
+ * Method that represents the class constructor.
+ * 
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_construct = function() {
+    this.m_constructKeys();
+    if (this.m_options.enable == true) {
+        this.m_constructEvent();
+    }
+};
+
+/**
+ * Creates all keys.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_constructKeys = function() {
+    var i = 0;
+
+    i = 1;
+    while(i &lt;= 12) {
+        this.m_constructKey("F"+i, 111+(i++));
+    }
+            
+    i = 65;
+    while (i &lt;= 90) {
+        this.m_constructKey(String.fromCharCode(i), i++);
+    }
+
+    i = 48;
+    this.m_constructKey("ZERO",         i++);
+    this.m_constructKey("ONE",          i++);
+    this.m_constructKey("TWO",          i++);
+    this.m_constructKey("THREE",        i++);
+    this.m_constructKey("FOUR",         i++);
+    this.m_constructKey("FIVE",         i++);
+    this.m_constructKey("SIX",          i++);
+    this.m_constructKey("SEVEN",        i++);
+    this.m_constructKey("EIGHT",        i++);
+    this.m_constructKey("NINE",         i++);
+
+    i = 96;
+    this.m_constructKey("NUMPADZERO",   i++);
+    this.m_constructKey("NUMPADONE",    i++);
+    this.m_constructKey("NUMPADTWO",    i++);
+    this.m_constructKey("NUMPADTHREE",  i++);
+    this.m_constructKey("NUMPADFOUR",   i++);
+    this.m_constructKey("NUMPADFIVE",   i++);
+    this.m_constructKey("NUMPADSIX",    i++);
+    this.m_constructKey("NUMPADSEVEN",  i++);
+    this.m_constructKey("NUMPADEIGHT",  i++);
+    this.m_constructKey("NUMPADNINE",   i++);
+    this.m_constructKey("PAGEUP",        33);
+    this.m_constructKey("PAGEDOWN",      34);
+    this.m_constructKey("HOME",          36);
+    this.m_constructKey("END",           35);
+    this.m_constructKey("INSERT",        45);
+
+    this.m_constructKey("ESCAPE",        27);
+    this.m_constructKey("MINUS",        189);
+    this.m_constructKey("NUMPADMINUS",  109);
+    this.m_constructKey("PLUS",         187);
+    this.m_constructKey("NUMPADPLUS",   107);
+    this.m_constructKey("DELETE",        46);
+    this.m_constructKey("BACKSPACE",      8);
+    this.m_constructKey("LBRACKET",     219);
+    this.m_constructKey("RBRACKET",     221);
+    this.m_constructKey("BACKSLASH",    220);
+    this.m_constructKey("CAPSLOCK",      20);
+    this.m_constructKey("SEMICOLON",    186);
+    this.m_constructKey("QUOTE",        222);
+    this.m_constructKey("ENTER",         13);
+    this.m_constructKey("SHIFT",         16);
+    this.m_constructKey("COMMA",        188);
+    this.m_constructKey("PERIOD",       190);
+    this.m_constructKey("NUMPADPERIOD", 110);
+    this.m_constructKey("SLASH",        191);
+    this.m_constructKey("NUMPADSLASH",  191);
+    this.m_constructKey("CONTROL",       17);
+    this.m_constructKey("ALT",           18);
+    this.m_constructKey("SPACE",         32);
+    this.m_constructKey("UP",            38);
+    this.m_constructKey("DOWN",          40);
+    this.m_constructKey("LEFT",          37);
+    this.m_constructKey("RIGHT",         39);
+    this.m_constructKey("TAB",            9);
+    this.m_constructKey("BACKQUOTE",    192);
+};
+
+/**
+ * Creates a specific key.
+ *
+ * @param {string} keyName Name of key.
+ * @param {number} keyCode Key code of key.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_constructKey = function(keyName, keyCode) {
+    this.m_LUT[keyName]  = keyCode;
+    this.m_keys[keyCode] = new rune.input.KeyboardKey();
+};
+
+/**
+ * Creates necessary event listeners.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_constructEvent = function() {
+    this.m_constructEventKeyDown();
+    this.m_constructEventKeyUp();
+};
+
+/**
+ * Create event listeners for KEY_DOWN.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_constructEventKeyDown = function() {
+    this.m_onKeyDownHandler = rune.util.Event.addEventListener(
+        this.m_options.target,
+        rune.util.Event.KEY_DOWN,
+        function(event) {
+            this.m_onKeyDown(event.keyCode);
+        },
+        {},
+        false,
+        this
+    );
+};
+
+/**
+ * Create event listeners for KEY_UP.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_constructEventKeyUp = function() {
+    this.m_onKeyUpHandler = rune.util.Event.addEventListener(
+        this.m_options.target,
+        rune.util.Event.KEY_UP,
+        function(event) {
+            this.m_onKeyUp(event.keyCode);
+        },
+        {},
+        false,
+        this
+    );
+};
+
+/**
+ * Updates the state of all keys.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_updateKeys = function() {
+    var i = this.m_keys.length;
+    while (i--) {
+        var key = this.m_keys[i];
+        if (key != null) {
+            key.update();
+        }
+    }
+};
+
+/**
+ * Removes all event listeners and resets all keys.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_disposeEvent = function() {
+    this.reset();
+    this.m_disposeEventKeyUp();
+    this.m_disposeEventKeyDown();
+};
+
+/**
+ * Removes event listeners for KEY_UP.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_disposeEventKeyUp = function() {
+    rune.util.Event.removeEventListener(
+        this.m_options.target,
+        rune.util.Event.KEY_UP,
+        this.m_onKeyUpHandler,
+        {},
+        false
+    );
+};
+
+/**
+ * Removes event listeners for KEY_DOWN.
+ *
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_disposeEventKeyDown = function() {
+    rune.util.Event.removeEventListener(
+        this.m_options.target,
+        rune.util.Event.KEY_DOWN,
+        this.m_onKeyDownHandler,
+        {},
+        false
+    );
+};
+
+/**
+ * Removes all keys.
+ *
+ * @returns {undefined}
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_disposeKeys = function() {
+    this.m_LUT = null;
+    this.m_keys.length = 0;
+    this.m_keys = null;
+};
+
+/**
+ * Event handler for KEY_DOWN.
+ *
+ * @param {number} keyCode ...
+ * 
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_onKeyDown = function(keyCode) {
+    var key = this.m_keys[keyCode];
+    if (key != null) key.onKeyDown();
+};
+
+/**
+ * Event handler for KEY_DOWN.
+ *
+ * @param {number} keyCode ...
+ * 
+ * @returns {undefined}
+ * @protected
+ * @ignore
+ */
+rune.input.Keyboard.prototype.m_onKeyUp = function(keyCode) {
+    var key = this.m_keys[keyCode];
+    if (key != null) key.onKeyUp();
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="rune.html">rune</a></li><li><a href="rune.animation.html">animation</a></li><li><a href="rune.camera.html">camera</a></li><li><a href="rune.color.html">color</a></li><li><a href="rune.data.html">data</a></li><li><a href="rune.display.html">display</a></li><li><a href="rune.game.html">game</a></li><li><a href="rune.geom.html">geom</a></li><li><a href="rune.input.html">input</a></li><li><a href="rune.media.html">media</a></li><li><a href="rune.net.html">net</a></li><li><a href="rune.physics.html">physics</a></li><li><a href="rune.resource.html">resource</a></li><li><a href="rune.scene.html">scene</a></li><li><a href="rune.screen.html">screen</a></li><li><a href="rune.state.html">state</a></li><li><a href="rune.system.html">system</a></li><li><a href="rune.text.html">text</a></li><li><a href="rune.tilemap.html">tilemap</a></li><li><a href="rune.timer.html">timer</a></li><li><a href="rune.tween.html">tween</a></li><li><a href="rune.ui.html">ui</a></li><li><a href="rune.util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="rune.animation.Animation.html">Animation</a></li><li><a href="rune.animation.Animations.html">Animations</a></li><li><a href="rune.camera.Camera.html">Camera</a></li><li><a href="rune.camera.CameraFade.html">CameraFade</a></li><li><a href="rune.camera.CameraFlash.html">CameraFlash</a></li><li><a href="rune.camera.Cameras.html">Cameras</a></li><li><a href="rune.camera.CameraShake.html">CameraShake</a></li><li><a href="rune.camera.CameraTargets.html">CameraTargets</a></li><li><a href="rune.camera.CameraTint.html">CameraTint</a></li><li><a href="rune.camera.CameraTintTween.html">CameraTintTween</a></li><li><a href="rune.camera.CameraViewport.html">CameraViewport</a></li><li><a href="rune.color.Color24.html">Color24</a></li><li><a href="rune.color.Color32.html">Color32</a></li><li><a href="rune.color.ColorComponent.html">ColorComponent</a></li><li><a href="rune.data.EngineManifest.html">EngineManifest</a></li><li><a href="rune.data.Highscores.html">Highscores</a></li><li><a href="rune.data.LogoIcon.html">LogoIcon</a></li><li><a href="rune.data.LogoText.html">LogoText</a></li><li><a href="rune.data.SceneBoot.html">SceneBoot</a></li><li><a href="rune.data.SceneBootDebug.html">SceneBootDebug</a></li><li><a href="rune.display.Canvas.html">Canvas</a></li><li><a href="rune.display.DisplayGroup.html">DisplayGroup</a></li><li><a href="rune.display.DisplayGroups.html">DisplayGroups</a></li><li><a href="rune.display.DisplayObject.html">DisplayObject</a></li><li><a href="rune.display.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="rune.display.Flicker.html">Flicker</a></li><li><a href="rune.display.Frame.html">Frame</a></li><li><a href="rune.display.Graphic.html">Graphic</a></li><li><a href="rune.display.Graphics.html">Graphics</a></li><li><a href="rune.display.Hitbox.html">Hitbox</a></li><li><a href="rune.display.InteractiveObject.html">InteractiveObject</a></li><li><a href="rune.display.Quadtree.html">Quadtree</a></li><li><a href="rune.display.RepeatedGraphic.html">RepeatedGraphic</a></li><li><a href="rune.display.Sprite.html">Sprite</a></li><li><a href="rune.display.Stage.html">Stage</a></li><li><a href="rune.display.Texture.html">Texture</a></li><li><a href="rune.game.Entity.html">Entity</a></li><li><a href="rune.geom.Point.html">Point</a></li><li><a href="rune.geom.Rectangle.html">Rectangle</a></li><li><a href="rune.geom.Vector2D.html">Vector2D</a></li><li><a href="rune.input.Gamepad.html">Gamepad</a></li><li><a href="rune.input.Gamepads.html">Gamepads</a></li><li><a href="rune.input.GamepadsOptions.html">GamepadsOptions</a></li><li><a href="rune.input.Inputs.html">Inputs</a></li><li><a href="rune.input.Keyboard.html">Keyboard</a></li><li><a href="rune.input.KeyboardKey.html">KeyboardKey</a></li><li><a href="rune.input.KeyboardOptions.html">KeyboardOptions</a></li><li><a href="rune.input.Mouse.html">Mouse</a></li><li><a href="rune.input.MouseButton.html">MouseButton</a></li><li><a href="rune.input.MouseOptions.html">MouseOptions</a></li><li><a href="rune.media.Sound.html">Sound</a></li><li><a href="rune.media.SoundChannel.html">SoundChannel</a></li><li><a href="rune.media.Sounds.html">Sounds</a></li><li><a href="rune.net.URLLoader.html">URLLoader</a></li><li><a href="rune.net.URLRequest.html">URLRequest</a></li><li><a href="rune.net.URLResponse.html">URLResponse</a></li><li><a href="rune.physics.Body.html">Body</a></li><li><a href="rune.physics.Space.html">Space</a></li><li><a href="rune.physics.Velocity.html">Velocity</a></li><li><a href="rune.resource.Cache.html">Cache</a></li><li><a href="rune.resource.Encoder.html">Encoder</a></li><li><a href="rune.resource.Manifest.html">Manifest</a></li><li><a href="rune.resource.Resources.html">Resources</a></li><li><a href="rune.resource.Storage.html">Storage</a></li><li><a href="rune.scene.Scene.html">Scene</a></li><li><a href="rune.scene.Scenes.html">Scenes</a></li><li><a href="rune.screen.Screen.html">Screen</a></li><li><a href="rune.state.State.html">State</a></li><li><a href="rune.state.States.html">States</a></li><li><a href="rune.system.Config.html">Config</a></li><li><a href="rune.system.Main.html">Main</a></li><li><a href="rune.system.Time.html">Time</a></li><li><a href="rune.text.BitmapField.html">BitmapField</a></li><li><a href="rune.text.BitmapFormat.html">BitmapFormat</a></li><li><a href="rune.tilemap.Tile.html">Tile</a></li><li><a href="rune.tilemap.Tilemap.html">Tilemap</a></li><li><a href="rune.tilemap.TilemapLayer.html">TilemapLayer</a></li><li><a href="rune.tilemap.TilemapLayers.html">TilemapLayers</a></li><li><a href="rune.tilemap.Tiles.html">Tiles</a></li><li><a href="rune.timer.Timer.html">Timer</a></li><li><a href="rune.timer.TimerOptions.html">TimerOptions</a></li><li><a href="rune.timer.Timers.html">Timers</a></li><li><a href="rune.tween.Back.html">Back</a></li><li><a href="rune.tween.Bounce.html">Bounce</a></li><li><a href="rune.tween.Circular.html">Circular</a></li><li><a href="rune.tween.Cubic.html">Cubic</a></li><li><a href="rune.tween.Expo.html">Expo</a></li><li><a href="rune.tween.Linear.html">Linear</a></li><li><a href="rune.tween.Quad.html">Quad</a></li><li><a href="rune.tween.Quart.html">Quart</a></li><li><a href="rune.tween.Quint.html">Quint</a></li><li><a href="rune.tween.Sine.html">Sine</a></li><li><a href="rune.tween.Tween.html">Tween</a></li><li><a href="rune.tween.TweenProp.html">TweenProp</a></li><li><a href="rune.tween.Tweens.html">Tweens</a></li><li><a href="rune.ui.Button.html">Button</a></li><li><a href="rune.ui.Console.html">Console</a></li><li><a href="rune.ui.ConsoleCommand.html">ConsoleCommand</a></li><li><a href="rune.ui.ConsoleCommands.html">ConsoleCommands</a></li><li><a href="rune.ui.ConsoleCursor.html">ConsoleCursor</a></li><li><a href="rune.ui.ConsoleHistory.html">ConsoleHistory</a></li><li><a href="rune.ui.ConsoleInput.html">ConsoleInput</a></li><li><a href="rune.ui.ConsoleManager.html">ConsoleManager</a></li><li><a href="rune.ui.ConsoleOutput.html">ConsoleOutput</a></li><li><a href="rune.ui.Counter.html">Counter</a></li><li><a href="rune.ui.CounterDigit.html">CounterDigit</a></li><li><a href="rune.ui.Debugger.html">Debugger</a></li><li><a href="rune.ui.Framerate.html">Framerate</a></li><li><a href="rune.ui.FramerateHistogram.html">FramerateHistogram</a></li><li><a href="rune.ui.FramerateHistogramBar.html">FramerateHistogramBar</a></li><li><a href="rune.ui.Memory.html">Memory</a></li><li><a href="rune.ui.MouseCursor.html">MouseCursor</a></li><li><a href="rune.ui.Progressbar.html">Progressbar</a></li><li><a href="rune.ui.RenderBudget.html">RenderBudget</a></li><li><a href="rune.ui.TextButton.html">TextButton</a></li><li><a href="rune.ui.UpdateBudget.html">UpdateBudget</a></li><li><a href="rune.util.DataURL.html">DataURL</a></li><li><a href="rune.util.Event.html">Event</a></li><li><a href="rune.util.Executable.html">Executable</a></li><li><a href="rune.util.Filter.html">Filter</a></li><li><a href="rune.util.Math.html">Math</a></li><li><a href="rune.util.Stack.html">Stack</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Mar 24 2021 22:09:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

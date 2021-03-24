@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Rune (bin)</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        
+        <!-- SOFTWARE DEVELOPMENT KIT -->
+        <script src="../dist/rune.js"></script>
+        
+        <!-- DEMO APPLICATION SOURCE CODE -->
+        <script src="../demo/scope/Manifest.js"></script>
+        <script src="../demo/data/manifest/Manifest.js"></script>
+        <script src="../demo/data/sprite/astronaut/Astronaut.js"></script>
+        <script src="../demo/data/sprite/astronaut/Astronauts.js"></script>
+        <script src="../demo/data/sprite/gamepad/GamepadButton.js"></script>
+        <script src="../demo/data/sprite/gamepad/Gamepad.js"></script>
+        <script src="../demo/scene/Scene000.js"></script>
+        <script src="../demo/scene/Scene001.js"></script>
+        <script src="../demo/scene/Scene002.js"></script>
+        <script src="../demo/system/Main.js"></script>
+        <script src="../demo/scope/Alias.js"></script>
+        
+        <!-- BOOTSTRAP -->
+        <script>
+            
+            window.onload = function() {
+                var app = new demo.system.Main();
+                app.start();
+            }
+            
+        </script>
+
+    </head>
+
+</html>

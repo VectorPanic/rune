@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: system/Main.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: system/Main.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>//------------------------------------------------------------------------------
+// Constructor scope
+//------------------------------------------------------------------------------
+
+/**
+ * Creates a new instance of Rune SDK.
+ *
+ * @constructor
+ *
+ * @param {Object} [options=null] Used to override the default properties.
+ * 
+ * @class
+ * @classdesc
+ * 
+ * Third party applications shall inherit from this class for the purpose of 
+ * creating their own applications based on the Rune SDK.
+ */
+rune.system.Main = function(options) {
+
+    //--------------------------------------------------------------------------
+    // Private properties
+    //--------------------------------------------------------------------------
+    
+    /**
+     * Internal configuration object containing initial global settings. 
+     * These settings should be considered static and should not be changed 
+     * during execution.
+     *
+     * @type {rune.system.Config}
+     * @private
+     */
+    this.m_config = new rune.system.Config(options);
+    
+    /**
+     * ...
+     *
+     * @type {rune.data.Highscores}
+     * @private
+     */
+    this.m_highscores = null;
+    
+    /**
+     * The input system.
+     *
+     * @type {rune.input.Inputs}
+     * @private
+     */
+    this.m_inputs = null;
+    
+    /**
+     * TODO: ...
+     *
+     * @type {rune.resource.Resources}
+     * @private
+     */
+    this.m_resources = null;
+    
+    /**
+     * Internal value to keep track of whether the engine is running or not. 
+     * Used to keep track of the start and stop processes.
+     *
+     * @type {boolean}
+     * @private
+     */
+    this.m_running = false;
+    
+    /**
+     * The scene system.
+     *
+     * @type {rune.scene.Scenes}
+     * @private
+     */
+    this.m_scenes = null;
+    
+    /**
+     * The screen system.
+     *
+     * @type {rune.screen.Screen}
+     * @private
+     */
+    this.m_screen = null;
+    
+    /**
+     * ...
+     *
+     * @type {rune.media.Sounds}
+     * @private
+     */
+    this.m_sounds = null;
+    
+    /**
+     * ...
+     *
+     * @type {rune.system.Time}
+     * @private
+     */
+    this.m_time = null;
+};
+
+//------------------------------------------------------------------------------
+// Private static properties
+//------------------------------------------------------------------------------
+
+/**
+ * Reference to the current application executed by the engine.
+ *
+ * @type {rune.system.Main}
+ * @private
+ */
+rune.system.Main.m_instance = null;
+
+//------------------------------------------------------------------------------
+// Private static constants
+//------------------------------------------------------------------------------
+
+/**
+ * Engine name.
+ *
+ * @const {string}
+ * @private
+ */
+rune.system.Main.NAME = "RUNE";
+
+/**
+ * Current version.
+ *
+ * @const {string}
+ * @private
+ */
+rune.system.Main.VERSION = "0.0.0";
+
+//------------------------------------------------------------------------------
+// Public static getter and setter methods
+//------------------------------------------------------------------------------
+
+/**
+ * Reference to the current application executed by the engine. This is mainly 
+ * for internal use.
+ *
+ * @member {rune.system.Main} instance
+ * @memberof rune.system.Main
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main, "instance", {
+    /**
+     * @ignore
+     */
+    get : function() {
+        return rune.system.Main.m_instance;
+    }
+});
+
+/**
+ * Version string containing name and version number.
+ *
+ * @member {string} version
+ * @memberof rune.system.Main
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main, "version", {
+    /**
+     * @ignore
+     */
+    get : function() {
+        return (rune.system.Main.NAME + " " + rune.system.Main.VERSION).toUpperCase();
+    }
+});
+
+//------------------------------------------------------------------------------
+// Public prototype getter and setter methods
+//------------------------------------------------------------------------------
+
+/**
+ * ...
+ *
+ * @member {rune.data.Highscores} highscores
+ * @memberof rune.system.Main
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main.prototype, "highscores", {
+    /**
+     * @this rune.system.Main
+     * @ignore
+     */
+    get : function() {
+        return this.m_highscores;
+    }
+});
+
+
+/**
+ * The input system.
+ *
+ * @member {rune.input.Inputs} inputs
+ * @memberof rune.system.Main
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main.prototype, "inputs", {
+    /**
+     * @this rune.system.Main
+     * @ignore
+     */
+    get : function() {
+        return this.m_inputs;
+    }
+});
+
+/**
+ * TODO: ...
+ *
+ * @member {rune.resource.Resources} resources
+ * @memberof rune.system.Main
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main.prototype, "resources", {
+    /**
+     * @this rune.system.Main
+     * @ignore
+     */
+    get : function() {
+        return this.m_resources;
+    }
+});
+
+/**
+ * The scene system.
+ *
+ * @member {rune.scene.Scenes} scenens
+ * @memberof rune.system.Main
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main.prototype, "scenes", {
+    /**
+     * @this rune.system.Main
+     * @ignore
+     */
+    get : function() {
+        return this.m_scenes;
+    }
+});
+
+/**
+ * The screen system.
+ *
+ * @member {rune.screen.Screen} screen
+ * @memberof rune.system.Main
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main.prototype, "screen", {
+    /**
+     * @this rune.system.Main
+     * @ignore
+     */
+    get : function() {
+        return this.m_screen;
+    }
+});
+
+/**
+ * The global sound manager. Handles playback of audio and music within the 
+ * context of the application.
+ *
+ * @member {rune.media.Sounds} sounds
+ * @memberof rune.system.Main
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main.prototype, "sounds", {
+    /**
+     * @this rune.system.Main
+     * @ignore
+     */
+    get : function() {
+        return this.m_sounds;
+    }
+});
+
+/**
+ * The module that handles the application's update and rendering loop.
+ *
+ * @member {rune.system.Time} time
+ * @memberof rune.system.Main
+ * @instance
+ * @readonly
+ */
+Object.defineProperty(rune.system.Main.prototype, "time", {
+    /**
+     * @this rune.system.Main
+     * @ignore
+     */
+    get : function() {
+        return this.m_time;
+    }
+});
+
+//------------------------------------------------------------------------------
+// Public prototype methods (API)
+//------------------------------------------------------------------------------
+
+/**
+ * Starts the current application based on the engine start-up process. 
+ * Start-up takes place at the end of the current tick, or as soon as the DOM 
+ * is ready.
+ *
+ * @return {undefined}
+ */
+rune.system.Main.prototype.start = function() {
+    if (this.m_running != true) {
+        this.m_running  = true;
+        var m_this = this;
+        if (document.readyState === "complete") {
+            window.setTimeout(function() {
+                m_this.m_preInit();
+            }, 0);
+        } else {
+            rune.util.Event.addEventListener(
+                window,
+                rune.util.Event.LOAD,
+                function(event) {
+                    m_this.start();
+                },
+                {
+                    once: true
+                }
+            );
+        }
+    }
+};
+
+/**
+ * Shuts down the current application and frees up allocated memory.
+ *
+ * @return {undefined}
+ */
+rune.system.Main.prototype.stop = function() {
+    if (this.m_running != false) {
+        this.m_running  = false;
+        var m_this = this;
+        if (document.readyState === "complete") {
+            window.setTimeout(function() {
+                m_this.m_dispose();
+            }, 0);
+        } else {
+            rune.util.Event.addEventListener(
+                window,
+                rune.util.Event.LOAD,
+                function(event) { 
+                    m_this.stop();
+                },
+                {
+                    once: true
+                }
+            );
+        }
+    }
+};
+
+//------------------------------------------------------------------------------
+// Private prototype methods
+//------------------------------------------------------------------------------
+
+/**
+ * Creates and activates subsystems that are necessary to start the engine.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_preInit = function() {
+    this.m_preTest();
+    this.m_preInitResources();
+};
+
+/**
+ * ...
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_preTest = function() {
+    var regex = new RegExp("^[a-z]+\.[a-z]+\.[a-z]+");
+    if (!regex.test(this.m_config.id)) {
+        throw new Error("Invalid application ID.");   
+    }
+};
+
+/**
+ * Creates and initiates the engine resource library. The process ensures that 
+ * all resources related to the engine are loaded, before any application code 
+ * is executed.
+ *
+ * @throws {Error} ...
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_preInitResources = function() {
+    this.m_disposeResources();
+    if (this.m_resources == null) {
+        this.m_resources = new rune.resource.Resources();
+        this.m_resources.load(new rune.data.EngineManifest(
+            new rune.util.Executable(this.m_init, this),
+            new rune.util.Executable(this.m_onResourcesProgress, this),
+            new rune.util.Executable(this.m_onResourcesError, this)
+        ), rune.resource.Storage.ENGINE);
+    } else throw new Error();
+};
+
+/**
+ * Creates and activates subsystems that are necessary to start an application, 
+ * or game, within the engine.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_init = function() {
+    this.m_initInstance();
+    this.m_initHighscores();
+    this.m_initSounds();
+    this.m_initScreen();
+    this.m_initInputs();
+    this.m_initScenes();
+    this.m_initTime();
+    this.m_initCommands();
+};
+
+/**
+ * Creates a static reference to the current application.
+ *
+ * @throws {Error} If an object reference already exists.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initInstance = function() {
+    this.m_disposeInstance();
+    if (rune.system.Main.m_instance == null) {
+        rune.system.Main.m_instance  = this;
+    } else throw new Error();
+};
+
+/**
+ * ...
+ *
+ * @throws {Error} If an object reference already exists.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initHighscores = function() {
+    this.m_disposeHighscores();
+    if (this.m_highscores == null) {
+        this.m_highscores = new rune.data.Highscores(
+            this.m_config.id,
+            1,
+            5
+        );
+    } else throw new Error();
+};
+
+/**
+ * ...
+ *
+ * @returns {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initSounds = function() {
+    this.m_disposeSounds();
+    if (this.m_sounds == null) {
+        this.m_sounds = new rune.media.Sounds();
+    } else throw new Error();
+};
+
+/**
+ * Creates the system that represents the screen.
+ *
+ * @throws {Error} If an object reference already exists.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initScreen = function() {
+    this.m_disposeScreen();
+    if (this.m_screen == null) {
+        this.m_screen = new rune.screen.Screen(this.m_config); 
+        this.m_screen["canvas"].attach(document.body); //TODO: CONFIG FOR TARGET
+    } else throw new Error();
+};
+
+/**
+ * Creates and activates the system that manages input devices.
+ *
+ * @throws {Error} If an object reference already exists.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initInputs = function() {
+    this.m_disposeInputs();
+    if (this.m_inputs == null) {
+        this.m_inputs = new rune.input.Inputs(this.m_config);
+    } else throw new Error();
+};
+
+/**
+ * Creates and activates the system that manages scenes.
+ *
+ * @throws {Error} If an object reference already exists.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initScenes = function() {
+    this.m_disposeScenes();
+    if (this.m_scenes == null) {
+        this.m_scenes = new rune.scene.Scenes();
+        this.m_scenes.load(this.m_config.debug ? 
+            [new rune.data.SceneBootDebug(this.m_config)] :
+            [new this.m_config.loader(this.m_config)]
+        );
+    } else throw new Error();
+};
+
+/**
+ * Creates and activates the system that calculates time.
+ *
+ * @throws {Error} If an object reference already exists.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initTime = function() {
+    this.m_disposeTime();
+    if (this.m_time == null) {
+        this.m_time = new rune.system.Time(this.m_config.framerate);
+        this.m_time['update'].add(this.m_update, this);
+        this.m_time['render'].add(this.m_render, this);
+        this.m_time.start();
+    } else throw new Error();
+};
+
+/**
+ * ...
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_initCommands = function() {
+    if (this.m_screen['console'] != null) {
+        
+        //@note: Quit the application.
+        this.m_screen['console']['commands'].create(
+            "quit",
+            function() {
+                this.stop();
+            },
+            this
+        );
+        
+        //@note: Print current version of Rune.
+        this.m_screen['console']['commands'].create(
+            "version",
+            function() {
+                return rune.system.Main.version;
+            },
+            this
+        );
+    }
+};
+
+/**
+ * The update loop.
+ *
+ * @param {number} step Current time step.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_update = function(step) {
+    this.m_updateInputs(step);
+    this.m_updateScenes(step);
+    this.m_updateScreen(step);
+};
+
+/**
+ * Updates all input devices.
+ *
+ * @param {number} step Current time step.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_updateInputs = function(step) {
+    if (this.m_inputs!= null) {
+        this.m_inputs.update(step);
+    }
+};
+
+/**
+ * Updates the scene system.
+ *
+ * @param {number} step Current time step.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_updateScenes = function(step) {
+    if (this.m_scenes != null) {
+        this.m_scenes.update(step);
+    }
+};
+
+/**
+ * ...
+ *
+ * @param {number} step Current time step.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_updateScreen = function(step) {
+    if (this.m_screen != null) {
+        this.m_screen.update(step);
+    }
+};
+
+
+/**
+ * The render loop.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_render = function() {
+    this.m_renderScenes();
+    this.m_renderScreen();
+};
+
+/**
+ * Renders objects in the selected scene.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_renderScenes = function() {
+    if (this.m_scenes!= null) {
+        this.m_scenes.render();
+    }
+};
+
+/**
+ * Renders objects on the screen.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_renderScreen = function() {
+    if (this.m_screen!= null &amp;&amp; this.m_screen['visible']) {
+        this.m_screen.render();
+    }
+};
+
+/**
+ * Stops and clears all subsystems from allocated memory.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_dispose = function() {
+    this.m_disposeTime()
+    this.m_disposeScenes();
+    this.m_disposeInputs();
+    this.m_disposeScreen();
+    this.m_disposeHighscores();
+    this.m_disposeInstance();
+    this.m_disposeSounds();
+    this.m_disposeResources();
+};
+
+/**
+ * Removes the system that calculates time.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeTime = function() {
+    if (this.m_time instanceof rune.system.Time) {
+        this.m_time.dispose();
+        this.m_time = null;
+    }
+};
+
+/**
+ * Removes the scene system.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeScenes = function() {
+    if (this.m_scenes instanceof rune.scene.Scenes) {
+        this.m_scenes.dispose();
+        this.m_scenes = null;
+    }
+};
+
+/**
+ * Removes the system that handles input devices.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeInputs = function() {
+    if (this.m_inputs instanceof rune.input.Inputs) {
+        this.m_inputs.dispose();
+        this.m_inputs = null;
+    }
+};
+
+/**
+ * Removes the system responsible for rendering graphics to the canvas element 
+ * that represents the screen.
+ *
+ * @throws {TypeError} If the reference to the screen system is invalid.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeScreen = function() {
+    if (this.m_screen instanceof rune.screen.Screen) {
+        this.m_screen.dispose();
+        this.m_screen = null;
+    }
+};
+
+/**
+ * ...
+ *
+ * @throws {TypeError} ...
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeHighscores = function() {
+    if (this.m_highscores instanceof rune.data.Highscores) {
+        this.m_highscores.dispose();
+        this.m_highscores = null;
+    }
+};
+
+/**
+ * Removes the static reference to the current application.
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeInstance = function() {
+    if (rune.system.Main.m_instance instanceof rune.system.Main) {
+        rune.system.Main.m_instance.stop();
+        rune.system.Main.m_instance = null;
+    }
+};
+
+/**
+ * ...
+ *
+ * @returns {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeSounds = function() {
+    if (this.m_sounds instanceof rune.media.Sounds) {
+        this.m_sounds.dispose();
+        this.m_sounds = null;
+    }
+};
+
+/**
+ * TODO: ...
+ *
+ * @return {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_disposeResources = function() {
+    if (this.m_resources != null) {
+        this.m_resources.dispose();
+        this.m_resources = null;
+    }
+};
+
+/**
+ * TODO: ...
+ *
+ * @param {string} name ...
+ * @param {string} type ...
+ * @param {Object} data ...
+ * @param {number} progress ...
+ *
+ * @returns {undefined}
+ * @private
+ */
+rune.system.Main.prototype.m_onResourcesProgress = function(name, type, data, progress) {
+    // @todo: ...
+};
+
+/**
+ * TODO: ...
+ *
+ * @param {rune.net.URLRequest} request ...
+ *
+ * @returns {undefined}
+ * @private
+ * @suppress {missingProperties}
+ */
+rune.system.Main.prototype.m_onResourcesError = function(request) {
+    alert("ERROR: Boot process aborted due to missing or corrupt resource file.");
+};</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="rune.html">rune</a></li><li><a href="rune.animation.html">animation</a></li><li><a href="rune.camera.html">camera</a></li><li><a href="rune.color.html">color</a></li><li><a href="rune.data.html">data</a></li><li><a href="rune.display.html">display</a></li><li><a href="rune.game.html">game</a></li><li><a href="rune.geom.html">geom</a></li><li><a href="rune.input.html">input</a></li><li><a href="rune.media.html">media</a></li><li><a href="rune.net.html">net</a></li><li><a href="rune.physics.html">physics</a></li><li><a href="rune.resource.html">resource</a></li><li><a href="rune.scene.html">scene</a></li><li><a href="rune.screen.html">screen</a></li><li><a href="rune.state.html">state</a></li><li><a href="rune.system.html">system</a></li><li><a href="rune.text.html">text</a></li><li><a href="rune.tilemap.html">tilemap</a></li><li><a href="rune.timer.html">timer</a></li><li><a href="rune.tween.html">tween</a></li><li><a href="rune.ui.html">ui</a></li><li><a href="rune.util.html">util</a></li></ul><h3>Classes</h3><ul><li><a href="rune.animation.Animation.html">Animation</a></li><li><a href="rune.animation.Animations.html">Animations</a></li><li><a href="rune.camera.Camera.html">Camera</a></li><li><a href="rune.camera.CameraFade.html">CameraFade</a></li><li><a href="rune.camera.CameraFlash.html">CameraFlash</a></li><li><a href="rune.camera.Cameras.html">Cameras</a></li><li><a href="rune.camera.CameraShake.html">CameraShake</a></li><li><a href="rune.camera.CameraTargets.html">CameraTargets</a></li><li><a href="rune.camera.CameraTint.html">CameraTint</a></li><li><a href="rune.camera.CameraTintTween.html">CameraTintTween</a></li><li><a href="rune.camera.CameraViewport.html">CameraViewport</a></li><li><a href="rune.color.Color24.html">Color24</a></li><li><a href="rune.color.Color32.html">Color32</a></li><li><a href="rune.color.ColorComponent.html">ColorComponent</a></li><li><a href="rune.data.EngineManifest.html">EngineManifest</a></li><li><a href="rune.data.Highscores.html">Highscores</a></li><li><a href="rune.data.LogoIcon.html">LogoIcon</a></li><li><a href="rune.data.LogoText.html">LogoText</a></li><li><a href="rune.data.SceneBoot.html">SceneBoot</a></li><li><a href="rune.data.SceneBootDebug.html">SceneBootDebug</a></li><li><a href="rune.display.Canvas.html">Canvas</a></li><li><a href="rune.display.DisplayGroup.html">DisplayGroup</a></li><li><a href="rune.display.DisplayGroups.html">DisplayGroups</a></li><li><a href="rune.display.DisplayObject.html">DisplayObject</a></li><li><a href="rune.display.DisplayObjectContainer.html">DisplayObjectContainer</a></li><li><a href="rune.display.Flicker.html">Flicker</a></li><li><a href="rune.display.Frame.html">Frame</a></li><li><a href="rune.display.Graphic.html">Graphic</a></li><li><a href="rune.display.Graphics.html">Graphics</a></li><li><a href="rune.display.Hitbox.html">Hitbox</a></li><li><a href="rune.display.InteractiveObject.html">InteractiveObject</a></li><li><a href="rune.display.Quadtree.html">Quadtree</a></li><li><a href="rune.display.RepeatedGraphic.html">RepeatedGraphic</a></li><li><a href="rune.display.Sprite.html">Sprite</a></li><li><a href="rune.display.Stage.html">Stage</a></li><li><a href="rune.display.Texture.html">Texture</a></li><li><a href="rune.game.Entity.html">Entity</a></li><li><a href="rune.geom.Point.html">Point</a></li><li><a href="rune.geom.Rectangle.html">Rectangle</a></li><li><a href="rune.geom.Vector2D.html">Vector2D</a></li><li><a href="rune.input.Gamepad.html">Gamepad</a></li><li><a href="rune.input.Gamepads.html">Gamepads</a></li><li><a href="rune.input.GamepadsOptions.html">GamepadsOptions</a></li><li><a href="rune.input.Inputs.html">Inputs</a></li><li><a href="rune.input.Keyboard.html">Keyboard</a></li><li><a href="rune.input.KeyboardKey.html">KeyboardKey</a></li><li><a href="rune.input.KeyboardOptions.html">KeyboardOptions</a></li><li><a href="rune.input.Mouse.html">Mouse</a></li><li><a href="rune.input.MouseButton.html">MouseButton</a></li><li><a href="rune.input.MouseOptions.html">MouseOptions</a></li><li><a href="rune.media.Sound.html">Sound</a></li><li><a href="rune.media.SoundChannel.html">SoundChannel</a></li><li><a href="rune.media.Sounds.html">Sounds</a></li><li><a href="rune.net.URLLoader.html">URLLoader</a></li><li><a href="rune.net.URLRequest.html">URLRequest</a></li><li><a href="rune.net.URLResponse.html">URLResponse</a></li><li><a href="rune.physics.Body.html">Body</a></li><li><a href="rune.physics.Space.html">Space</a></li><li><a href="rune.physics.Velocity.html">Velocity</a></li><li><a href="rune.resource.Cache.html">Cache</a></li><li><a href="rune.resource.Encoder.html">Encoder</a></li><li><a href="rune.resource.Manifest.html">Manifest</a></li><li><a href="rune.resource.Resources.html">Resources</a></li><li><a href="rune.resource.Storage.html">Storage</a></li><li><a href="rune.scene.Scene.html">Scene</a></li><li><a href="rune.scene.Scenes.html">Scenes</a></li><li><a href="rune.screen.Screen.html">Screen</a></li><li><a href="rune.state.State.html">State</a></li><li><a href="rune.state.States.html">States</a></li><li><a href="rune.system.Config.html">Config</a></li><li><a href="rune.system.Main.html">Main</a></li><li><a href="rune.system.Time.html">Time</a></li><li><a href="rune.text.BitmapField.html">BitmapField</a></li><li><a href="rune.text.BitmapFormat.html">BitmapFormat</a></li><li><a href="rune.tilemap.Tile.html">Tile</a></li><li><a href="rune.tilemap.Tilemap.html">Tilemap</a></li><li><a href="rune.tilemap.TilemapLayer.html">TilemapLayer</a></li><li><a href="rune.tilemap.TilemapLayers.html">TilemapLayers</a></li><li><a href="rune.tilemap.Tiles.html">Tiles</a></li><li><a href="rune.timer.Timer.html">Timer</a></li><li><a href="rune.timer.TimerOptions.html">TimerOptions</a></li><li><a href="rune.timer.Timers.html">Timers</a></li><li><a href="rune.tween.Back.html">Back</a></li><li><a href="rune.tween.Bounce.html">Bounce</a></li><li><a href="rune.tween.Circular.html">Circular</a></li><li><a href="rune.tween.Cubic.html">Cubic</a></li><li><a href="rune.tween.Expo.html">Expo</a></li><li><a href="rune.tween.Linear.html">Linear</a></li><li><a href="rune.tween.Quad.html">Quad</a></li><li><a href="rune.tween.Quart.html">Quart</a></li><li><a href="rune.tween.Quint.html">Quint</a></li><li><a href="rune.tween.Sine.html">Sine</a></li><li><a href="rune.tween.Tween.html">Tween</a></li><li><a href="rune.tween.TweenProp.html">TweenProp</a></li><li><a href="rune.tween.Tweens.html">Tweens</a></li><li><a href="rune.ui.Button.html">Button</a></li><li><a href="rune.ui.Console.html">Console</a></li><li><a href="rune.ui.ConsoleCommand.html">ConsoleCommand</a></li><li><a href="rune.ui.ConsoleCommands.html">ConsoleCommands</a></li><li><a href="rune.ui.ConsoleCursor.html">ConsoleCursor</a></li><li><a href="rune.ui.ConsoleHistory.html">ConsoleHistory</a></li><li><a href="rune.ui.ConsoleInput.html">ConsoleInput</a></li><li><a href="rune.ui.ConsoleManager.html">ConsoleManager</a></li><li><a href="rune.ui.ConsoleOutput.html">ConsoleOutput</a></li><li><a href="rune.ui.Counter.html">Counter</a></li><li><a href="rune.ui.CounterDigit.html">CounterDigit</a></li><li><a href="rune.ui.Debugger.html">Debugger</a></li><li><a href="rune.ui.Framerate.html">Framerate</a></li><li><a href="rune.ui.FramerateHistogram.html">FramerateHistogram</a></li><li><a href="rune.ui.FramerateHistogramBar.html">FramerateHistogramBar</a></li><li><a href="rune.ui.Memory.html">Memory</a></li><li><a href="rune.ui.MouseCursor.html">MouseCursor</a></li><li><a href="rune.ui.Progressbar.html">Progressbar</a></li><li><a href="rune.ui.RenderBudget.html">RenderBudget</a></li><li><a href="rune.ui.TextButton.html">TextButton</a></li><li><a href="rune.ui.UpdateBudget.html">UpdateBudget</a></li><li><a href="rune.util.DataURL.html">DataURL</a></li><li><a href="rune.util.Event.html">Event</a></li><li><a href="rune.util.Executable.html">Executable</a></li><li><a href="rune.util.Filter.html">Filter</a></li><li><a href="rune.util.Math.html">Math</a></li><li><a href="rune.util.Stack.html">Stack</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Mar 24 2021 22:09:45 GMT+0100 (Central European Standard Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
