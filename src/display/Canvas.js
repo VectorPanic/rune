@@ -488,7 +488,7 @@ rune.display.Canvas.prototype.m_constructCanvas = function() {
         this.m_canvas = document.createElement('canvas');
         this.m_canvas.width  = this.m_width;
         this.m_canvas.height = this.m_height;
-        this.m_canvas.style.imageRendering = "crisp-edges"; //pixelated
+        this.m_canvas.style.imageRendering = "pixelated";
     } else throw new Error();
 };
 

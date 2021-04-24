@@ -188,8 +188,7 @@ demo.data.Astronauts.prototype.m_updateBounds = function(step) {
  * @return {undefined}
  */
 demo.data.Astronauts.prototype.m_updateCollision = function(step) {
-    //this.hitTestGroup(this); //@todo: better name.
-    this.hitTestXXX(this);
+    this.collideGroup(this);
 };
 
 /**

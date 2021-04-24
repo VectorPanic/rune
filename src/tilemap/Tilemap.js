@@ -180,7 +180,6 @@ rune.tilemap.Tilemap.prototype.collideObject = function(body) {
     tiles.push(this.getTileAtPosition(body['hitbox'].x, body['hitbox'].y + body['hitbox'].height));
     tiles.push(this.getTileAtPosition(body['hitbox'].x + body['hitbox'].width, body['hitbox'].y + body['hitbox'].height));
     
-    
     for (var i = 0; i < tiles.length; i++) {
         if (tiles[i].tile.allowCollisions) {
             

@@ -679,13 +679,13 @@ rune.camera.Camera.prototype.m_updateBoundaries = function(step) {
  * @return {undefined}
  * @protected
  * @ignore
+ * @suppress {checkTypes}
  */
 rune.camera.Camera.prototype.m_renderTilemap = function() {
     // WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP
     // WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP
     // WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP
     
-    /*
     if (this.input) {
         
         var tw = this.input.tilemap.tileWidth;
@@ -731,7 +731,6 @@ rune.camera.Camera.prototype.m_renderTilemap = function() {
             }
         }
     }
-    */
     
     // WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP
     // WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP WIP
